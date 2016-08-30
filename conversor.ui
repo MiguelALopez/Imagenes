@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Conversor</class>
+ <widget class="QMainWindow" name="Conversor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>870</width>
+    <height>717</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Conversor</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Conversor</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="1" alignment="Qt::AlignHCenter">
+         <widget class="QLabel" name="labelTitulo">
+          <property name="text">
+           <string>Convertidor de escalas</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="2">
+            <widget class="QPushButton" name="buttomCargar">
+             <property name="text">
+              <string>Cargar</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelInicial">
+             <property name="text">
+              <string>Inicial</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelUrl">
+             <property name="text">
+              <string>URL</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLabel" name="labelFinal">
+             <property name="text">
+              <string>Final</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineURL"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QComboBox" name="comboInicial">
+             <item>
+              <property name="text">
+               <string>RGB</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Yue</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CMY</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>HSV</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Oppenet</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="2">
+            <widget class="QComboBox" name="comboFinal">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>RGB</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Yue</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CMY</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>HSV</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Opponent</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="8" column="1">
+         <widget class="QWidget" name="widget_2" native="true">
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="1">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelImage1">
+             <property name="minimumSize">
+              <size>
+               <width>350</width>
+               <height>350</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="4">
+            <widget class="QLabel" name="labelImage2">
+             <property name="minimumSize">
+              <size>
+               <width>350</width>
+               <height>350</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>---&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="7" column="1" alignment="Qt::AlignHCenter">
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Convertir</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>60</y>
+          <width>80</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>20</y>
+          <width>59</width>
+          <height>15</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
