@@ -24,6 +24,7 @@ private slots:
     void on_pushButton_2_clicked();
 
     void convertRGBtoYue();
+    void convertRGBtoHSV();
 
 private:
     Ui::Conversor *ui;

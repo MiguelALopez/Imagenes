@@ -80,11 +80,6 @@
              </item>
              <item>
               <property name="text">
-               <string>CMY</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
                <string>HSV</string>
               </property>
              </item>
@@ -111,7 +106,7 @@
            <item row="2" column="2">
             <widget class="QComboBox" name="comboFinal">
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <item>
               <property name="text">
@@ -121,11 +116,6 @@
              <item>
               <property name="text">
                <string>Yue</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CMY</string>
               </property>
              </item>
              <item>
