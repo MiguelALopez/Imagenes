@@ -125,7 +125,32 @@
              </item>
              <item>
               <property name="text">
+               <string>HSL</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Opponent</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CMY</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>R</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>G</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>B</string>
               </property>
              </item>
             </widget>

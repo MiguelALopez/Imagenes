@@ -29,6 +29,7 @@ private slots:
 private:
     Ui::Conversor *ui;
     QImage imageOriginal;
+    QImage imageTrasformada;
 };
 
 #endif // CONVERSOR_H
