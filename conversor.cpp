@@ -16,6 +16,24 @@ Conversor::~Conversor()
     delete ui;
 }
 
+// Evento encargado de capturar el redimencinamiento de la ventana
+void Conversor::resizeEvent(QResizeEvent * event){
+    QMainWindow::resizeEvent(event);
+    if(!imageOriginal.isNull()){
+        int w = ui->labelImage1->width();
+        int h = ui->labelImage1->width();
+        ui->labelImage1->setPixmap(QPixmap::fromImage(imageOriginal).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImage1->setStyleSheet("border: 0px solid");
+    }
+
+    if(!imageTrasformada.isNull()){
+        int w = ui->labelImage2->width();
+        int h = ui->labelImage2->width();
+        ui->labelImage2->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImage2->setStyleSheet("border: 0px solid");
+    }
+}
+
 void Conversor::on_buttomCargar_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", "All Files (*.*);;Image (*.png)");
@@ -26,6 +44,7 @@ void Conversor::on_buttomCargar_clicked()
     QPixmap image(filename);
     int w = ui->labelImage1->width();
     int h = ui->labelImage1->height();
+    //int h = ui->labelImage1->width();
     ui->labelImage1->setPixmap(image.scaled(w, h, Qt::KeepAspectRatio));
     ui->labelImage1->setStyleSheet("border: 0px solid");
 
@@ -33,8 +52,7 @@ void Conversor::on_buttomCargar_clicked()
     imageTrasformada.load(filename);
 }
 
-void Conversor::on_pushButton_2_clicked(){
-    //std::cout << ui->comboInicial->currentIndex() << " - " << ui->comboFinal->cu << std::endl;
+void Conversor::on_buttomConvertir_clicked(){
     for(int i = 0; i < imageOriginal.width(); i++){
         for(int j = 0; j < imageOriginal.height(); j++){
 
@@ -63,9 +81,15 @@ void Conversor::on_pushButton_2_clicked(){
                 int L = imageOriginal.pixelColor(i, j).lightness();
                 imageTrasformada.setPixel(i, j, qRgb(H, S, L));
             }else if(ui->comboInicial->currentIndex() == 0 && ui->comboFinal->currentIndex() == 4){ // RGB to Opponent Color
-                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
-                int O2 = imageOriginal.pixelColor(i, j).red() * 0.3 + imageOriginal.pixelColor(i, j).green() * 0.04 + imageOriginal.pixelColor(i, j).blue() * -0.35;
-                int O3 = imageOriginal.pixelColor(i, j).red() * 0.34 + imageOriginal.pixelColor(i, j).green() * -0.6 + imageOriginal.pixelColor(i, j).blue() * 0.17;
+//                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
+//                int O2 = imageOriginal.pixelColor(i, j).red() * 0.3 + imageOriginal.pixelColor(i, j).green() * 0.04 + imageOriginal.pixelColor(i, j).blue() * -0.35;
+//                int O3 = imageOriginal.pixelColor(i, j).red() * 0.34 + imageOriginal.pixelColor(i, j).green() * -0.6 + imageOriginal.pixelColor(i, j).blue() * 0.17;
+                int R = imageOriginal.pixelColor(i, j).red();
+                int G = imageOriginal.pixelColor(i, j).green();
+                int B = imageOriginal.pixelColor(i, j).blue();
+                double O1 = (R - G) / sqrt(2);
+                double O2 = (R + G - 2*B) / sqrt(6);
+                double O3 = (R + G + B) / sqrt(3);
                 imageTrasformada.setPixel(i, j, qRgb(O1, O2, O3));
 
             }else if(ui->comboInicial->currentIndex() == 0 && ui->comboFinal->currentIndex() == 5){ // RGB to CMY
@@ -82,32 +106,21 @@ void Conversor::on_pushButton_2_clicked(){
 
             }else if(ui->comboInicial->currentIndex() == 0 && ui->comboFinal->currentIndex() == 8){ // RGB to B
                 imageTrasformada.setPixel(i, j, qRgb(0, 0, imageOriginal.pixelColor(i, j).blue()));
-            }
 
+            }else if(ui->comboInicial->currentIndex() == 0 && ui->comboFinal->currentIndex() == 9){ // RGB to RGB invertidos
+                int R = 255 - imageOriginal.pixelColor(i, j).red();
+                int G = 255 - imageOriginal.pixelColor(i, j).green();
+                int B = 255 - imageOriginal.pixelColor(i, j).blue();
+
+                imageTrasformada.setPixel(i, j, qRgb(R, G, B));
+            }
         }
     }
 
     int w = ui->labelImage2->width();
-    int h = ui->labelImage2->height();
+    //int h = ui->labelImage2->height();
+    int h = ui->labelImage2->width();
     ui->labelImage2->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
     ui->labelImage2->setStyleSheet("border: 0px solid");
 
-}
-
-void Conversor::convertRGBtoYue(){
-    for(int i = 0; i < imageOriginal.width(); i++){
-        for(int j = 0; j < imageOriginal.height(); j++){
-            int color = imageOriginal.pixelColor(i, j).red() * 0.299 + imageOriginal.pixelColor(i, j).green() * 0.587 + imageOriginal.pixelColor(i, j).blue() * 0.114;
-            imageOriginal.setPixelColor(i, j, QColor(color, color, color));
-        }
-    }
-
-    int w = ui->labelImage2->width();
-    int h = ui->labelImage2->height();
-    ui->labelImage2->setPixmap(QPixmap::fromImage(imageOriginal).scaled(w, h, Qt::KeepAspectRatio));
-    ui->labelImage2->setStyleSheet("border: 0px solid");
-}
-
-void Conversor::convertRGBtoHSV(){
-    //for(int i = 0; i < )
 }

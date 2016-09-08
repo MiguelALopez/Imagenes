@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>870</width>
-    <height>717</height>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -153,9 +153,27 @@
                <string>B</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Invert</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item row="7" column="1" alignment="Qt::AlignHCenter">
+         <widget class="QPushButton" name="buttomConvertir">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Convertir</string>
+          </property>
          </widget>
         </item>
         <item row="9" column="1">
@@ -174,19 +192,6 @@
         <item row="8" column="1">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="labelImage1">
              <property name="minimumSize">
@@ -201,19 +206,6 @@
             </widget>
            </item>
            <item row="0" column="3">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="4">
             <widget class="QLabel" name="labelImage2">
              <property name="minimumSize">
               <size>
@@ -226,27 +218,52 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>---&gt;</string>
+           <item row="0" column="1">
+            <widget class="QWidget" name="widget_3" native="true">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>350</height>
+              </size>
              </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>---&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item row="7" column="1" alignment="Qt::AlignHCenter">
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="minimumSize">
-           <size>
-            <width>300</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Convertir</string>
-          </property>
          </widget>
         </item>
        </layout>

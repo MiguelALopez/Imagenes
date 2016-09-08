@@ -19,12 +19,12 @@ public:
     explicit Conversor(QWidget *parent = 0);
     ~Conversor();
 
+    void resizeEvent(QResizeEvent * event);
+
 private slots:
     void on_buttomCargar_clicked();
-    void on_pushButton_2_clicked();
+    void on_buttomConvertir_clicked();
 
-    void convertRGBtoYue();
-    void convertRGBtoHSV();
 
 private:
     Ui::Conversor *ui;
