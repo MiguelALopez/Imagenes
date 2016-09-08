@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QPixmap>
 #include <QRgb>
 #include <iostream>
@@ -22,8 +23,8 @@ public:
     void resizeEvent(QResizeEvent * event);
 
 private slots:
-    void on_buttomCargar_clicked();
-    void on_buttomConvertir_clicked();
+    void on_buttomLoad_clicked();
+    void on_buttomConvert_clicked();
 
 
 private:
