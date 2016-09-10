@@ -31,6 +31,9 @@ private:
     Ui::Conversor *ui;
     QImage imageOriginal;
     QImage imageTrasformada;
+    QImage imageChanelR;
+    QImage imageChanelG;
+    QImage imageChanelB;
 };
 
 #endif // CONVERSOR_H

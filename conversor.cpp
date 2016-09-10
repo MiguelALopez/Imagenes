@@ -58,75 +58,123 @@ void Conversor::on_buttomLoad_clicked()
 }
 
 void Conversor::on_buttomConvert_clicked(){
-    imageTrasformada = imageOriginal;
+    if(!imageOriginal.isNull()){
+        imageTrasformada = imageOriginal;
+        imageChanelR = imageOriginal;
+        imageChanelG = imageOriginal;
+        imageChanelB = imageOriginal;
 
-    for(int i = 0; i < imageOriginal.width(); i++){
-        for(int j = 0; j < imageOriginal.height(); j++){
-            if(ui->comboFinal->currentIndex() == 0){ // RGB to RGB
-                int R = imageOriginal.pixelColor(i, j).red();
-                int G = imageOriginal.pixelColor(i, j).green();
-                int B = imageOriginal.pixelColor(i, j).blue();
-                imageTrasformada.setPixel(i, j, qRgb(R, G, B));
 
-            }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Yub
-                int color = imageOriginal.pixelColor(i, j).red() * 0.299 + imageOriginal.pixelColor(i, j).green() * 0.587 + imageOriginal.pixelColor(i, j).blue() * 0.114;
-                imageTrasformada.setPixelColor(i, j, QColor(color, color, color));
+        for(int i = 0; i < imageOriginal.width(); i++){
+            for(int j = 0; j < imageOriginal.height(); j++){
+                if(ui->comboFinal->currentIndex() == 0){ // RGB to RGB
+                    int R = imageOriginal.pixelColor(i, j).red();
+                    int G = imageOriginal.pixelColor(i, j).green();
+                    int B = imageOriginal.pixelColor(i, j).blue();
 
-            }else if(ui->comboFinal->currentIndex() == 2){// RGB yo HSV
-                int H = imageOriginal.pixelColor(i, j).hue();
-                int S = imageOriginal.pixelColor(i, j).saturation();
-                int V = imageOriginal.pixelColor(i, j).value();
-//                imageOriginal.setPixelColor(i, j, QColor(H, S, V));
-                imageTrasformada.setPixel(i, j, qRgb(H, S, V));
-//                std::cout << "R: " << imageOriginal.pixelColor(i, j).red() << " G: " << imageOriginal.pixelColor(i, j).green() << " B: " << imageOriginal.pixelColor(i, j).blue() << std::endl;
-//                std::cout << "hue: " << H << " saturation: " << S <<  " Value: " << V << std::endl;
 
-            }else if(ui->comboFinal->currentIndex() == 3){ // RGB to HSL
-                int H = imageOriginal.pixelColor(i, j).hue();
-                int S = imageOriginal.pixelColor(i, j).saturation();
-                int L = imageOriginal.pixelColor(i, j).lightness();
-                imageTrasformada.setPixel(i, j, qRgb(H, S, L));
-            }else if(ui->comboFinal->currentIndex() == 4){ // RGB to Opponent Color
-//                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
-//                int O2 = imageOriginal.pixelColor(i, j).red() * 0.3 + imageOriginal.pixelColor(i, j).green() * 0.04 + imageOriginal.pixelColor(i, j).blue() * -0.35;
-//                int O3 = imageOriginal.pixelColor(i, j).red() * 0.34 + imageOriginal.pixelColor(i, j).green() * -0.6 + imageOriginal.pixelColor(i, j).blue() * 0.17;
-                int R = imageOriginal.pixelColor(i, j).red();
-                int G = imageOriginal.pixelColor(i, j).green();
-                int B = imageOriginal.pixelColor(i, j).blue();
-                double O1 = (R - G) / sqrt(2);
-                double O2 = (R + G - 2*B) / sqrt(6);
-                double O3 = (R + G + B) / sqrt(3);
-                imageTrasformada.setPixel(i, j, qRgb(O1, O2, O3));
+                    imageTrasformada.setPixel(i, j, qRgb(R, G, B));
+                    imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
+                    imageChanelG.setPixel(i, j, qRgb(0, G, 0));
+                    imageChanelB.setPixel(i, j, qRgb(0, 0, B));
 
-            }else if(ui->comboFinal->currentIndex() == 5){ // RGB to CMY
-                int C = imageOriginal.pixelColor(i, j).cyan();
-                int M = imageOriginal.pixelColor(i, j).magenta();
-                int Y = imageOriginal.pixelColor(i, j).yellow();
-                imageTrasformada.setPixel(i, j, qRgb(C, M, Y));
+                }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Yub
+                    int color = imageOriginal.pixelColor(i, j).red() * 0.299 + imageOriginal.pixelColor(i, j).green() * 0.587 + imageOriginal.pixelColor(i, j).blue() * 0.114;
+                    imageTrasformada.setPixelColor(i, j, QColor(color, color, color));
 
-            }else if(ui->comboFinal->currentIndex() == 6){ // RGB to R
-                imageTrasformada.setPixel(i, j, qRgb(imageOriginal.pixelColor(i, j).red(), 0, 0));
+                    imageChanelR.setPixel(i, j, qRgb(color, 0, 0));
+                    imageChanelG.setPixel(i, j, qRgb(0, color, 0));
+                    imageChanelB.setPixel(i, j, qRgb(0, 0, color));
 
-            }else if(ui->comboFinal->currentIndex() == 7){ // RGB to G
-                imageTrasformada.setPixel(i, j, qRgb(0, imageOriginal.pixelColor(i, j).green(), 0));
+                }else if(ui->comboFinal->currentIndex() == 2){// RGB yo HSV
+                    int H = imageOriginal.pixelColor(i, j).hue();
+                    int S = imageOriginal.pixelColor(i, j).saturation();
+                    int V = imageOriginal.pixelColor(i, j).value();
+    //                imageOriginal.setPixelColor(i, j, QColor(H, S, V));
+                    imageTrasformada.setPixel(i, j, qRgb(H, S, V));
+                    imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
+                    imageChanelG.setPixel(i, j, qRgb(0, S, 0));
+                    imageChanelB.setPixel(i, j, qRgb(0, 0, V));
+    //                std::cout << "R: " << imageOriginal.pixelColor(i, j).red() << " G: " << imageOriginal.pixelColor(i, j).green() << " B: " << imageOriginal.pixelColor(i, j).blue() << std::endl;
+    //                std::cout << "hue: " << H << " saturation: " << S <<  " Value: " << V << std::endl;
 
-            }else if(ui->comboFinal->currentIndex() == 8){ // RGB to B
-                imageTrasformada.setPixel(i, j, qRgb(0, 0, imageOriginal.pixelColor(i, j).blue()));
+                }else if(ui->comboFinal->currentIndex() == 3){ // RGB to HSL
+                    int H = imageOriginal.pixelColor(i, j).hue();
+                    int S = imageOriginal.pixelColor(i, j).saturation();
+                    int L = imageOriginal.pixelColor(i, j).lightness();
+                    imageTrasformada.setPixel(i, j, qRgb(H, S, L));
+                    imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
+                    imageChanelG.setPixel(i, j, qRgb(0, S, 0));
+                    imageChanelB.setPixel(i, j, qRgb(0, 0, L));
 
-            }else if(ui->comboFinal->currentIndex() == 9){ // RGB to RGB invertidos
-                int R = 255 - imageOriginal.pixelColor(i, j).red();
-                int G = 255 - imageOriginal.pixelColor(i, j).green();
-                int B = 255 - imageOriginal.pixelColor(i, j).blue();
+                }else if(ui->comboFinal->currentIndex() == 4){ // RGB to Opponent Color
+    //                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
+    //                int O2 = imageOriginal.pixelColor(i, j).red() * 0.3 + imageOriginal.pixelColor(i, j).green() * 0.04 + imageOriginal.pixelColor(i, j).blue() * -0.35;
+    //                int O3 = imageOriginal.pixelColor(i, j).red() * 0.34 + imageOriginal.pixelColor(i, j).green() * -0.6 + imageOriginal.pixelColor(i, j).blue() * 0.17;
+                    int R = imageOriginal.pixelColor(i, j).red();
+                    int G = imageOriginal.pixelColor(i, j).green();
+                    int B = imageOriginal.pixelColor(i, j).blue();
+                    double O1 = (R - G) / sqrt(2);
+                    double O2 = (R + G - 2*B) / sqrt(6);
+                    double O3 = (R + G + B) / sqrt(3);
+                    imageTrasformada.setPixel(i, j, qRgb(O1, O2, O3));
+                    imageChanelR.setPixel(i, j, qRgb(O1, 0, 0));
+                    imageChanelG.setPixel(i, j, qRgb(0, O2, 0));
+                    imageChanelB.setPixel(i, j, qRgb(0, 0, O2));
 
-                imageTrasformada.setPixel(i, j, qRgb(R, G, B));
+                }else if(ui->comboFinal->currentIndex() == 5){ // RGB to CMY
+                    int C = imageOriginal.pixelColor(i, j).cyan();
+                    int M = imageOriginal.pixelColor(i, j).magenta();
+                    int Y = imageOriginal.pixelColor(i, j).yellow();
+                    imageTrasformada.setPixel(i, j, qRgb(C, M, Y));
+                    imageChanelR.setPixel(i, j, qRgb(C, 255, 255));
+                    imageChanelG.setPixel(i, j, qRgb(255, M, 255));
+                    imageChanelB.setPixel(i, j, qRgb(255, 255, Y));
+
+                }else if(ui->comboFinal->currentIndex() == 6){ // RGB to R
+                    imageTrasformada.setPixel(i, j, qRgb(imageOriginal.pixelColor(i, j).red(), 0, 0));
+
+                }else if(ui->comboFinal->currentIndex() == 7){ // RGB to G
+                    imageTrasformada.setPixel(i, j, qRgb(0, imageOriginal.pixelColor(i, j).green(), 0));
+
+                }else if(ui->comboFinal->currentIndex() == 8){ // RGB to B
+                    imageTrasformada.setPixel(i, j, qRgb(0, 0, imageOriginal.pixelColor(i, j).blue()));
+
+                }else if(ui->comboFinal->currentIndex() == 9){ // RGB to RGB invertidos
+                    int R = 255 - imageOriginal.pixelColor(i, j).red();
+                    int G = 255 - imageOriginal.pixelColor(i, j).green();
+                    int B = 255 - imageOriginal.pixelColor(i, j).blue();
+
+                    imageTrasformada.setPixel(i, j, qRgb(R, G, B));
+                    imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
+                    imageChanelG.setPixel(i, j, qRgb(0, G, 0));
+                    imageChanelB.setPixel(i, j, qRgb(B, 0, B));
+
+                }
             }
         }
-    }
 
-    int w = ui->labelImage2->width();
-    //int h = ui->labelImage2->height();
-    int h = ui->labelImage2->width();
-    ui->labelImage2->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
-    ui->labelImage2->setStyleSheet("border: 0px solid");
+        int w = ui->labelImage2->width();
+        int h = ui->labelImage2->width();
+        ui->labelImage2->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImage2->setStyleSheet("border: 0px solid");
+
+        w = ui->labelChannelR->width();
+        h = ui->labelChannelR->height();
+        ui->labelChannelR->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelChannelR->setStyleSheet("border: 0px solid");
+
+        w = ui->labelChannelG->width();
+        h = ui->labelChannelG->height();
+        ui->labelChannelG->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelChannelG->setStyleSheet("border: 0px solid");
+
+        w = ui->labelChannelB->width();
+        h = ui->labelChannelB->height();
+        ui->labelChannelB->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelChannelB->setStyleSheet("border: 0px solid");
+    }else{
+        QMessageBox::information(this, "Error","Por favor seleccione un tiki");
+    }
 
 }
