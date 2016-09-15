@@ -22,6 +22,10 @@ public:
 
     void resizeEvent(QResizeEvent * event);
 
+    typedef enum{
+        RGB, GRAYSCALE, HSV, HSL, OPPONENT, CMY, INVERTIDOS
+    }TypeTransform;
+
 private slots:
     void on_buttonLoad_clicked();
     void on_buttonConvert_clicked();
@@ -40,9 +44,12 @@ private:
     QImage imageChanelR;
     QImage imageChanelG;
     QImage imageChanelB;
+    QImage imageChoosed;
     QImage imageFiltered;
 
     int selectedFlag;
+
+    TypeTransform transform;
 };
 
 #endif // CONVERSOR_H

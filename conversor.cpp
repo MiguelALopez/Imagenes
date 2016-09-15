@@ -136,6 +136,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, G, 0));
                     imageChanelB.setPixel(i, j, qRgb(0, 0, B));
+                    transform = RGB;
 
                 }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Grayscale
                     int color = imageOriginal.pixelColor(i, j).red() * 0.299 + imageOriginal.pixelColor(i, j).green() * 0.587 + imageOriginal.pixelColor(i, j).blue() * 0.114;
@@ -144,6 +145,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(color, color, color));
                     imageChanelG.setPixel(i, j, qRgb(color, color, color));
                     imageChanelB.setPixel(i, j, qRgb(color, color, color));
+                    transform = GRAYSCALE;
 
                 }else if(ui->comboFinal->currentIndex() == 2){// RGB yo HSV
                     int H = imageOriginal.pixelColor(i, j).hue();
@@ -154,6 +156,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, S, 0));
                     imageChanelB.setPixel(i, j, qRgb(0, 0, V));
+                    transform = HSV;
     //                std::cout << "R: " << imageOriginal.pixelColor(i, j).red() << " G: " << imageOriginal.pixelColor(i, j).green() << " B: " << imageOriginal.pixelColor(i, j).blue() << std::endl;
     //                std::cout << "hue: " << H << " saturation: " << S <<  " Value: " << V << std::endl;
 
@@ -165,6 +168,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, S, 0));
                     imageChanelB.setPixel(i, j, qRgb(0, 0, L));
+                    transform = HSL;
 
                 }else if(ui->comboFinal->currentIndex() == 4){ // RGB to Opponent Color
     //                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
@@ -180,6 +184,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(O1, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, O2, 0));
                     imageChanelB.setPixel(i, j, qRgb(0, 0, O2));
+                    transform = OPPONENT;
 
                 }else if(ui->comboFinal->currentIndex() == 5){ // RGB to CMY
                     int C = imageOriginal.pixelColor(i, j).cyan();
@@ -189,6 +194,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(C, 255, 255));
                     imageChanelG.setPixel(i, j, qRgb(255, M, 255));
                     imageChanelB.setPixel(i, j, qRgb(255, 255, Y));
+                    transform = CMY;
 
                 }else if(ui->comboFinal->currentIndex() == 6){ // RGB to R
                     imageTrasformada.setPixel(i, j, qRgb(imageOriginal.pixelColor(i, j).red(), 0, 0));
@@ -208,6 +214,7 @@ void Conversor::on_buttonConvert_clicked(){
                     imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, G, 0));
                     imageChanelB.setPixel(i, j, qRgb(B, 0, B));
+                    transform = INVERTIDOS;
 
                 }
             }
@@ -246,17 +253,17 @@ void Conversor::on_buttonSelectChannel_clicked()
     if (ui->comboChannel->currentIndex() == 0){ // Channel 1
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        selectedFlag = 0;
+        imageChoosed = imageChanelR;
 
     }else if (ui->comboChannel->currentIndex() == 1){ // Channel 2
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        selectedFlag = 1;
+        imageChoosed = imageChanelG;
 
     }else if(ui->comboChannel->currentIndex() == 2){
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        selectedFlag = 2;
+        imageChoosed = imageChanelB;
 
     }
 }
@@ -265,43 +272,33 @@ void Conversor::on_buttonSelectChannel_clicked()
 void Conversor::on_buttonApplyConvolution_clicked()
 {
 
-    switch (selectedFlag) {
-    case 0:{ // Filtro promedio
-        imageFiltered = imageChanelR;
-        int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
+    imageFiltered = imageChanelR;
+    int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+    int w = imageChanelR.width();
+    int h = imageChanelR.height();
 
-        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int pixel = 0;
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
+    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    for(int i = middle; i < w - middle; i++){
+        for(int j = middle; j < h - middle; j++){
+            int pixel = 0;
+            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+            for(int x = 0; x < kernelSize; x++){
+                for(int y = 0; y < kernelSize; y++){
 
-                        pixel += imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
+                    pixel += imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
 
-                    }
                 }
-                pixel = pixel / (kernelSize * kernelSize);
-//                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
-                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
             }
+            pixel = pixel / (kernelSize * kernelSize);
+//                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
+            imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
         }
-        int wx = ui->labelImageConvFilt->width();
-        int hx = ui->labelImageConvFilt->height();
-        ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageFiltered).scaled(wx, hx, Qt::KeepAspectRatio));
-        ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
-//            std::cout << "tiki termino" << std::endl;
-    }break;
-    case 1:{ // Filtro Gaussiano
-
     }
-    default:{
+    int wx = ui->labelImageConvFilt->width();
+    int hx = ui->labelImageConvFilt->height();
+    ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageFiltered).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
 
-    }break;
-    }
 }
 
 
