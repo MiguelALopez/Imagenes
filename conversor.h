@@ -23,9 +23,15 @@ public:
     void resizeEvent(QResizeEvent * event);
 
 private slots:
-    void on_buttomLoad_clicked();
-    void on_buttomConvert_clicked();
+    void on_buttonLoad_clicked();
+    void on_buttonConvert_clicked();
 
+
+    void on_buttonSelectChannel_clicked();
+
+    void on_buttonApplyConvolution_clicked();
+
+    void on_tabWidget_currentChanged(int index);
 
 private:
     Ui::Conversor *ui;
@@ -34,6 +40,9 @@ private:
     QImage imageChanelR;
     QImage imageChanelG;
     QImage imageChanelB;
+    QImage imageFiltered;
+
+    int selectedFlag;
 };
 
 #endif // CONVERSOR_H

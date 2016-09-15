@@ -6,6 +6,7 @@ Conversor::Conversor(QWidget *parent) :
     ui(new Ui::Conversor)
 {
     ui->setupUi(this);
+    selectedFlag = -1;
 //    ui->labelImage1->setStyleSheet("border: 0.5px solid grey");
 //    ui->labelImage2->setStyleSheet("border: 0.5px solid grey");
 
@@ -19,22 +20,79 @@ Conversor::~Conversor()
 // Evento encargado de capturar el redimencinamiento de la ventana
 void Conversor::resizeEvent(QResizeEvent * event){
     QMainWindow::resizeEvent(event);
-    if(!imageOriginal.isNull()){
-        int w = ui->labelImage1->width();
-        int h = ui->labelImage1->width();
-        ui->labelImage1->setPixmap(QPixmap::fromImage(imageOriginal).scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImage1->setStyleSheet("border: 0px solid");
+    if(!imageOriginal.isNull()){ // Redimenciona el campo de la imagen origina
+        int w = ui->labelImageOriginal->width();
+        int h = ui->labelImageOriginal->width();
+        ui->labelImageOriginal->setPixmap(QPixmap::fromImage(imageOriginal).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageOriginal->setStyleSheet("border: 0px solid");
     }
 
-    if(!imageTrasformada.isNull()){
-        int w = ui->labelImage2->width();
-        int h = ui->labelImage2->width();
-        ui->labelImage2->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImage2->setStyleSheet("border: 0px solid");
+    if(!imageTrasformada.isNull()){ // Redimenciona el campo de la imagen trasformada
+        int w = ui->labelImageTransformed->width();
+        int h = ui->labelImageTransformed->width();
+        ui->labelImageTransformed->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageTransformed->setStyleSheet("border: 0px solid");
+    }
+
+    if(!imageFiltered.isNull()){ // Redimenciona el campo de la imagen con el filtro
+        int w = ui->labelImageConvFilt->width();
+        int h = ui->labelImageConvFilt->width();
+        ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageFiltered).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
+    }
+
+    switch (selectedFlag) { // Redimenciona el campo de la imagen original de covolucion
+    case 0:{
+        int w = ui->labelImageConvOrig->width();
+        int h = ui->labelImageConvOrig->width();
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+    }break;
+    case 1:{
+        int w = ui->labelImageConvOrig->width();
+        int h = ui->labelImageConvOrig->width();
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+    }break;
+    case 2:{
+        int w = ui->labelImageConvOrig->width();
+        int h = ui->labelImageConvOrig->width();
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+    }
+    default:{
+    }break;
     }
 }
 
-void Conversor::on_buttomLoad_clicked()
+void Conversor::on_tabWidget_currentChanged(int index)
+{
+    if(index == 1){
+        switch (selectedFlag) { // Redimenciona el campo de la imagen original de covolucion
+        case 0:{
+            int w = ui->labelImageConvOrig->width();
+            int h = ui->labelImageConvOrig->width();
+            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        }break;
+        case 1:{
+            int w = ui->labelImageConvOrig->width();
+            int h = ui->labelImageConvOrig->width();
+            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        }break;
+        case 2:{
+            int w = ui->labelImageConvOrig->width();
+            int h = ui->labelImageConvOrig->width();
+            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        }
+        }
+    }
+}
+
+// Evento encargado de cargar la imagen desde una ubicacion
+void Conversor::on_buttonLoad_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", "All Files (*.*);;Image (*.png)");
 
@@ -44,11 +102,11 @@ void Conversor::on_buttomLoad_clicked()
         ui->lineURL->setText(filename);
 
         QPixmap image(filename);
-        int w = ui->labelImage1->width();
+        int w = ui->labelImageOriginal->width();
 //        int h = ui->labelImage1->height();
-        int h = ui->labelImage1->width();
-        ui->labelImage1->setPixmap(image.scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImage1->setStyleSheet("border: 0px solid");
+        int h = ui->labelImageOriginal->width();
+        ui->labelImageOriginal->setPixmap(image.scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageOriginal->setStyleSheet("border: 0px solid");
 
         imageOriginal.load(filename);
 
@@ -57,7 +115,8 @@ void Conversor::on_buttomLoad_clicked()
     }
 }
 
-void Conversor::on_buttomConvert_clicked(){
+// Evento encargado de pasar una imagen a un espacio de color
+void Conversor::on_buttonConvert_clicked(){
     if(!imageOriginal.isNull()){
         imageTrasformada = imageOriginal;
         imageChanelR = imageOriginal;
@@ -78,13 +137,13 @@ void Conversor::on_buttomConvert_clicked(){
                     imageChanelG.setPixel(i, j, qRgb(0, G, 0));
                     imageChanelB.setPixel(i, j, qRgb(0, 0, B));
 
-                }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Yub
+                }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Grayscale
                     int color = imageOriginal.pixelColor(i, j).red() * 0.299 + imageOriginal.pixelColor(i, j).green() * 0.587 + imageOriginal.pixelColor(i, j).blue() * 0.114;
                     imageTrasformada.setPixelColor(i, j, QColor(color, color, color));
 
-                    imageChanelR.setPixel(i, j, qRgb(color, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, color, 0));
-                    imageChanelB.setPixel(i, j, qRgb(0, 0, color));
+                    imageChanelR.setPixel(i, j, qRgb(color, color, color));
+                    imageChanelG.setPixel(i, j, qRgb(color, color, color));
+                    imageChanelB.setPixel(i, j, qRgb(color, color, color));
 
                 }else if(ui->comboFinal->currentIndex() == 2){// RGB yo HSV
                     int H = imageOriginal.pixelColor(i, j).hue();
@@ -154,10 +213,10 @@ void Conversor::on_buttomConvert_clicked(){
             }
         }
 
-        int w = ui->labelImage2->width();
-        int h = ui->labelImage2->width();
-        ui->labelImage2->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImage2->setStyleSheet("border: 0px solid");
+        int w = ui->labelImageTransformed->width();
+        int h = ui->labelImageTransformed->width();
+        ui->labelImageTransformed->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageTransformed->setStyleSheet("border: 0px solid");
 
         w = ui->labelChannelR->width();
         h = ui->labelChannelR->height();
@@ -178,3 +237,71 @@ void Conversor::on_buttomConvert_clicked(){
     }
 
 }
+
+// Evento encargado de seleccionar un canal para la convolucion
+void Conversor::on_buttonSelectChannel_clicked()
+{
+    int w = ui->labelImageConvOrig->width();
+    int h = ui->labelImageConvOrig->height();
+    if (ui->comboChannel->currentIndex() == 0){ // Channel 1
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        selectedFlag = 0;
+
+    }else if (ui->comboChannel->currentIndex() == 1){ // Channel 2
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        selectedFlag = 1;
+
+    }else if(ui->comboChannel->currentIndex() == 2){
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        selectedFlag = 2;
+
+    }
+}
+
+// Evento encargado de hacer la convolucion
+void Conversor::on_buttonApplyConvolution_clicked()
+{
+
+    switch (selectedFlag) {
+    case 0:{ // Filtro promedio
+        imageFiltered = imageChanelR;
+        int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+        int w = imageChanelR.width();
+        int h = imageChanelR.height();
+
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        for(int i = middle; i < w - middle; i++){
+            for(int j = middle; j < h - middle; j++){
+                int pixel = 0;
+                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                for(int x = 0; x < kernelSize; x++){
+                    for(int y = 0; y < kernelSize; y++){
+
+                        pixel += imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
+
+                    }
+                }
+                pixel = pixel / (kernelSize * kernelSize);
+//                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
+                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+            }
+        }
+        int wx = ui->labelImageConvFilt->width();
+        int hx = ui->labelImageConvFilt->height();
+        ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageFiltered).scaled(wx, hx, Qt::KeepAspectRatio));
+        ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
+//            std::cout << "tiki termino" << std::endl;
+    }break;
+    case 1:{ // Filtro Gaussiano
+
+    }
+    default:{
+
+    }break;
+    }
+}
+
+
