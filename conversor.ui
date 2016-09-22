@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -170,6 +170,11 @@
              <item>
               <property name="text">
                <string>Channel 3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Greyscale</string>
               </property>
              </item>
             </widget>
@@ -456,11 +461,6 @@
           </item>
           <item>
            <property name="text">
-            <string>Gaussian filter</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string>Minimum filter</string>
            </property>
           </item>
@@ -472,6 +472,16 @@
           <item>
            <property name="text">
             <string>Middle filter</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Gaussian filter x3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Gaussian filter x5</string>
            </property>
           </item>
          </widget>
@@ -512,7 +522,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>21</width>
+                  <width>40</width>
                   <height>20</height>
                  </size>
                 </property>

@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QRgb>
 #include <iostream>
+#include <math.h>
 
 namespace Ui {
 class Conversor;
