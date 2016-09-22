@@ -47,8 +47,6 @@ private:
     QImage imageChoosed;
     QImage imageFiltered;
 
-    int selectedFlag;
-
     TypeTransform transform;
 };
 

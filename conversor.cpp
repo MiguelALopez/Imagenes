@@ -6,7 +6,6 @@ Conversor::Conversor(QWidget *parent) :
     ui(new Ui::Conversor)
 {
     ui->setupUi(this);
-    selectedFlag = -1;
 //    ui->labelImage1->setStyleSheet("border: 0.5px solid grey");
 //    ui->labelImage2->setStyleSheet("border: 0.5px solid grey");
 
@@ -41,54 +40,24 @@ void Conversor::resizeEvent(QResizeEvent * event){
         ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
     }
 
-    switch (selectedFlag) { // Redimenciona el campo de la imagen original de covolucion
-    case 0:{
-        int w = ui->labelImageConvOrig->width();
-        int h = ui->labelImageConvOrig->width();
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-    }break;
-    case 1:{
-        int w = ui->labelImageConvOrig->width();
-        int h = ui->labelImageConvOrig->width();
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-    }break;
-    case 2:{
-        int w = ui->labelImageConvOrig->width();
-        int h = ui->labelImageConvOrig->width();
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
-        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-    }
-    default:{
-    }break;
-    }
+    if(!imageChoosed.isNull()){
+            int w = ui->labelImageConvOrig->width();
+            int h = ui->labelImageConvOrig->width();
+            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        }
 }
 
 void Conversor::on_tabWidget_currentChanged(int index)
 {
     if(index == 1){
-        switch (selectedFlag) { // Redimenciona el campo de la imagen original de covolucion
-        case 0:{
-            int w = ui->labelImageConvOrig->width();
-            int h = ui->labelImageConvOrig->width();
-            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        }break;
-        case 1:{
-            int w = ui->labelImageConvOrig->width();
-            int h = ui->labelImageConvOrig->width();
-            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        }break;
-        case 2:{
-            int w = ui->labelImageConvOrig->width();
-            int h = ui->labelImageConvOrig->width();
-            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+            if(!imageChoosed.isNull()){
+                int w = ui->labelImageConvOrig->width();
+                int h = ui->labelImageConvOrig->width();
+                ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+                ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+            }
         }
-        }
-    }
 }
 
 // Evento encargado de cargar la imagen desde una ubicacion
@@ -127,9 +96,10 @@ void Conversor::on_buttonConvert_clicked(){
         for(int i = 0; i < imageOriginal.width(); i++){
             for(int j = 0; j < imageOriginal.height(); j++){
                 if(ui->comboFinal->currentIndex() == 0){ // RGB to RGB
-                    int R = imageOriginal.pixelColor(i, j).red();
-                    int G = imageOriginal.pixelColor(i, j).green();
-                    int B = imageOriginal.pixelColor(i, j).blue();
+
+                    int R = QColor(imageOriginal.pixel(i, j)).red();
+                    int G = QColor(imageOriginal.pixel(i, j)).green();
+                    int B = QColor(imageOriginal.pixel(i, j)).blue();
 
 
                     imageTrasformada.setPixel(i, j, qRgb(R, G, B));
@@ -139,7 +109,7 @@ void Conversor::on_buttonConvert_clicked(){
                     transform = RGB;
 
                 }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Grayscale
-                    int color = imageOriginal.pixelColor(i, j).red() * 0.299 + imageOriginal.pixelColor(i, j).green() * 0.587 + imageOriginal.pixelColor(i, j).blue() * 0.114;
+                    int color = QColor(imageOriginal.pixel(i, j)).red() * 0.299 + QColor(imageOriginal.pixel(i, j)).green() * 0.587 + QColor(imageOriginal.pixel(i, j)).blue() * 0.114;
                     imageTrasformada.setPixelColor(i, j, QColor(color, color, color));
 
                     imageChanelR.setPixel(i, j, qRgb(color, color, color));
@@ -148,9 +118,9 @@ void Conversor::on_buttonConvert_clicked(){
                     transform = GRAYSCALE;
 
                 }else if(ui->comboFinal->currentIndex() == 2){// RGB yo HSV
-                    int H = imageOriginal.pixelColor(i, j).hue();
-                    int S = imageOriginal.pixelColor(i, j).saturation();
-                    int V = imageOriginal.pixelColor(i, j).value();
+                    int H = QColor(imageOriginal.pixel(i, j)).hue();
+                    int S = QColor(imageOriginal.pixel(i, j)).saturation();
+                    int V = QColor(imageOriginal.pixel(i, j)).value();
     //                imageOriginal.setPixelColor(i, j, QColor(H, S, V));
                     imageTrasformada.setPixel(i, j, qRgb(H, S, V));
                     imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
@@ -161,9 +131,9 @@ void Conversor::on_buttonConvert_clicked(){
     //                std::cout << "hue: " << H << " saturation: " << S <<  " Value: " << V << std::endl;
 
                 }else if(ui->comboFinal->currentIndex() == 3){ // RGB to HSL
-                    int H = imageOriginal.pixelColor(i, j).hue();
-                    int S = imageOriginal.pixelColor(i, j).saturation();
-                    int L = imageOriginal.pixelColor(i, j).lightness();
+                    int H = QColor(imageOriginal.pixel(i, j)).hue();
+                    int S = QColor(imageOriginal.pixel(i, j)).saturation();
+                    int L = QColor(imageOriginal.pixel(i, j)).lightness();
                     imageTrasformada.setPixel(i, j, qRgb(H, S, L));
                     imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, S, 0));
@@ -174,9 +144,9 @@ void Conversor::on_buttonConvert_clicked(){
     //                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
     //                int O2 = imageOriginal.pixelColor(i, j).red() * 0.3 + imageOriginal.pixelColor(i, j).green() * 0.04 + imageOriginal.pixelColor(i, j).blue() * -0.35;
     //                int O3 = imageOriginal.pixelColor(i, j).red() * 0.34 + imageOriginal.pixelColor(i, j).green() * -0.6 + imageOriginal.pixelColor(i, j).blue() * 0.17;
-                    int R = imageOriginal.pixelColor(i, j).red();
-                    int G = imageOriginal.pixelColor(i, j).green();
-                    int B = imageOriginal.pixelColor(i, j).blue();
+                    int R = QColor(imageOriginal.pixel(i, j)).red();
+                    int G = QColor(imageOriginal.pixel(i, j)).green();
+                    int B = QColor(imageOriginal.pixel(i, j)).blue();
                     double O1 = (R - G) / sqrt(2);
                     double O2 = (R + G - 2*B) / sqrt(6);
                     double O3 = (R + G + B) / sqrt(3);
@@ -187,9 +157,9 @@ void Conversor::on_buttonConvert_clicked(){
                     transform = OPPONENT;
 
                 }else if(ui->comboFinal->currentIndex() == 5){ // RGB to CMY
-                    int C = imageOriginal.pixelColor(i, j).cyan();
-                    int M = imageOriginal.pixelColor(i, j).magenta();
-                    int Y = imageOriginal.pixelColor(i, j).yellow();
+                    int C = QColor(imageOriginal.pixel(i, j)).cyan();
+                    int M = QColor(imageOriginal.pixel(i, j)).magenta();
+                    int Y = QColor(imageOriginal.pixel(i, j)).yellow();
                     imageTrasformada.setPixel(i, j, qRgb(C, M, Y));
                     imageChanelR.setPixel(i, j, qRgb(C, 255, 255));
                     imageChanelG.setPixel(i, j, qRgb(255, M, 255));
@@ -197,18 +167,18 @@ void Conversor::on_buttonConvert_clicked(){
                     transform = CMY;
 
                 }else if(ui->comboFinal->currentIndex() == 6){ // RGB to R
-                    imageTrasformada.setPixel(i, j, qRgb(imageOriginal.pixelColor(i, j).red(), 0, 0));
+                    imageTrasformada.setPixel(i, j, qRgb(QColor(imageOriginal.pixel(i, j)).red(), 0, 0));
 
                 }else if(ui->comboFinal->currentIndex() == 7){ // RGB to G
-                    imageTrasformada.setPixel(i, j, qRgb(0, imageOriginal.pixelColor(i, j).green(), 0));
+                    imageTrasformada.setPixel(i, j, qRgb(0, QColor(imageOriginal.pixel(i, j)).green(), 0));
 
                 }else if(ui->comboFinal->currentIndex() == 8){ // RGB to B
-                    imageTrasformada.setPixel(i, j, qRgb(0, 0, imageOriginal.pixelColor(i, j).blue()));
+                    imageTrasformada.setPixel(i, j, qRgb(0, 0, QColor(imageOriginal.pixel(i, j)).blue()));
 
                 }else if(ui->comboFinal->currentIndex() == 9){ // RGB to RGB invertidos
-                    int R = 255 - imageOriginal.pixelColor(i, j).red();
-                    int G = 255 - imageOriginal.pixelColor(i, j).green();
-                    int B = 255 - imageOriginal.pixelColor(i, j).blue();
+                    int R = 255 - QColor(imageOriginal.pixel(i, j)).red();
+                    int G = 255 - QColor(imageOriginal.pixel(i, j)).green();
+                    int B = 255 - QColor(imageOriginal.pixel(i, j)).blue();
 
                     imageTrasformada.setPixel(i, j, qRgb(R, G, B));
                     imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
@@ -271,29 +241,133 @@ void Conversor::on_buttonSelectChannel_clicked()
 // Evento encargado de hacer la convolucion
 void Conversor::on_buttonApplyConvolution_clicked()
 {
-
     imageFiltered = imageChanelR;
-    int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
-    int w = imageChanelR.width();
-    int h = imageChanelR.height();
+    if(ui->comboConvolution->currentIndex() == 0){ // Average filter
+        int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+        int w = imageChanelR.width();
+        int h = imageChanelR.height();
 
-    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-    for(int i = middle; i < w - middle; i++){
-        for(int j = middle; j < h - middle; j++){
-            int pixel = 0;
-            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-            for(int x = 0; x < kernelSize; x++){
-                for(int y = 0; y < kernelSize; y++){
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        for(int i = middle; i < w - middle; i++){
+            for(int j = middle; j < h - middle; j++){
+                int pixel = 0;
+                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                for(int x = 0; x < kernelSize; x++){
+                    for(int y = 0; y < kernelSize; y++){
 
-                    pixel += imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
+                        pixel += imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
 
+                    }
+                }
+                pixel = pixel / (kernelSize * kernelSize);
+    //                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
+                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+            }
+        }
+    }else if(ui->comboConvolution->currentIndex() == 1){ // Gaussian filter
+        int commonFilter[3][3] = {{1,2,1},{2,4,2},{1,2,1}};
+        int w = imageChanelR.width();
+        int h = imageChanelR.height();
+
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        for(int i = middle; i < w - middle; i++){
+            for(int j = middle; j < h - middle; j++){
+                int pixel = 0;
+                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                for(int x = 0; x < kernelSize; x++){
+                    for(int y = 0; y < kernelSize; y++){
+                        pixel += imageChanelR.pixelColor(i - middle + x, j - middle + y).red() * commonFilter[x][y];
+                    }
+                }
+                pixel = pixel / 16;
+    //                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
+                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+            }
+        }
+    }else if(ui->comboConvolution->currentIndex() == 2){ // Minimum filter
+        int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+        int w = imageChanelR.width();
+        int h = imageChanelR.height();
+
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        for(int i = middle; i < w - middle; i++){
+            for(int j = middle; j < h - middle; j++){
+                int min = 255;
+                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                for(int x = 0; x < kernelSize; x++){
+                    for(int y = 0; y < kernelSize; y++){
+                        if(imageChanelR.pixelColor(i - middle + x, j - middle + y).red() < min){
+                            min = imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
+                        }
+                    }
+                }
+                imageFiltered.setPixel(i, j, qRgb(min, min, min));
+            }
+        }
+    }else if(ui->comboConvolution->currentIndex() == 3){ // Maximum filter
+        int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+        int w = imageChanelR.width();
+        int h = imageChanelR.height();
+
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        for(int i = middle; i < w - middle; i++){
+            for(int j = middle; j < h - middle; j++){
+                int max = 0;
+                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                for(int x = 0; x < kernelSize; x++){
+                    for(int y = 0; y < kernelSize; y++){
+                        if(imageChanelR.pixelColor(i - middle + x, j - middle + y).red() > max){
+                            max = imageChanelR.pixelColor(i - middle + x, j - middle + y).red();
+                        }
+                    }
+                }
+                imageFiltered.setPixel(i, j, qRgb(max, max, max));
+            }
+        }
+    }else if(ui->comboConvolution->currentIndex() == 4){ // Middle filter
+        int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+        int w = imageChanelR.width();
+        int h = imageChanelR.height();
+
+            int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        if(transform == GRAYSCALE){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    QList<int> list;
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            list << QColor(imageChanelR.pixel(i - middle + x, j - middle + y)).red();
+
+                        }
+                    }
+
+                    qSort(list.begin(), list.end());
+                    pixel = list.at(list.length() / 2);
+                    imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
                 }
             }
-            pixel = pixel / (kernelSize * kernelSize);
-//                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
-            imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+        }else{
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+
+                            pixel += QColor(imageChanelR.pixel(i - middle + x, j - middle + y)).red();
+
+                        }
+                    }
+                    pixel = pixel / (kernelSize * kernelSize);
+                    imageFiltered.setPixel(i, j, qRgb(pixel, QColor(imageFiltered.pixel(i, j)).green(), QColor(imageFiltered.pixel(i, j)).blue()));
+                }
+            }
         }
     }
+
+
     int wx = ui->labelImageConvFilt->width();
     int hx = ui->labelImageConvFilt->height();
     ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageFiltered).scaled(wx, hx, Qt::KeepAspectRatio));
