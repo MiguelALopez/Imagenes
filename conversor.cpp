@@ -121,7 +121,6 @@ void Conversor::on_buttonConvert_clicked(){
                     int H = QColor(imageOriginal.pixel(i, j)).hue();
                     int S = QColor(imageOriginal.pixel(i, j)).saturation();
                     int V = QColor(imageOriginal.pixel(i, j)).value();
-    //                imageOriginal.setPixelColor(i, j, QColor(H, S, V));
                     imageTrasformada.setPixel(i, j, qRgb(H, S, V));
                     imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
                     imageChanelG.setPixel(i, j, qRgb(0, S, 0));
@@ -224,95 +223,261 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
         imageChoosed = imageChanelR;
+        channel = RED;
 
     }else if (ui->comboChannel->currentIndex() == 1){ // Channel 2
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
         imageChoosed = imageChanelG;
+        channel = GREEN;
 
     }else if(ui->comboChannel->currentIndex() == 2){ // Chanel 3
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
         imageChoosed = imageChanelB;
+        channel = BLUE;
+
     }else if(ui->comboChannel->currentIndex() == 3){ // All the channels
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageFiltered).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        imageChoosed = imageFiltered;
+        imageChoosed = imageTrasformada;
+        channel = ALL;
     }
 }
-
 // Evento encargado de hacer la convolucion
-void Conversor::on_buttonApplyConvolution_clicked()
-{
+void Conversor::on_buttonApplyConvolution_clicked(){
     imageFiltered = imageChoosed;
     if(ui->comboConvolution->currentIndex() == 0){ // Average filter
         int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
-
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
         int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int pixel = 0;
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
-                        pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+
+        if (channel == RED){ // Average filter for the RED channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                        }
                     }
+                    pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
+                    imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
                 }
-                pixel = pixel / (kernelSize * kernelSize);
-    //                imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
-                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+            }
+        }else if(channel == BLUE){ // Average filter for the GREEN channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                        }
+                    }
+                    pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), pixel, imageFiltered.pixelColor(i, j).blue()));
+                }
+            }
+        }else if(channel == GREEN){ // Average filter for the BLUE channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                        }
+                    }
+                    pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), imageFiltered.pixelColor(i, j).green(), pixel));
+                }
+            }
+        }else if(channel == ALL){ // Average filter for ALL channels
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixelR = 0;
+                    int pixelG = 0;
+                    int pixelB = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                            pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                            pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                        }
+                    }
+                    pixelR = pixelR / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles RED
+                    pixelG = pixelG / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles GREEN
+                    pixelB = pixelB / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles BLUE
+                    imageFiltered.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+                }
             }
         }
+
 
     }else if(ui->comboConvolution->currentIndex() == 1){ // Minimum filter
         int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
-
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
         int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int min = 255;
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
-                        if(QColor(imageChanelR.pixel(i - middle + x, j - middle + y)).red() < min){
-                            min = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+
+        if(channel == RED){ // Minumun filter for the RED channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int min = 255;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() < min){
+                                min = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                            }
                         }
                     }
+                    imageFiltered.setPixel(i, j, qRgb(min, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
                 }
-                imageFiltered.setPixel(i, j, qRgb(min, min, min));
+            }
+        } else if (channel == GREEN){ // Minumun filter for the GREEN channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int min = 255;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() < min){
+                                min = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                            }
+                        }
+                    }
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), min, imageFiltered.pixelColor(i, j).blue()));
+                }
+            }
+        }else if (channel == BLUE){ // Minimun filter for the BLUE channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int min = 255;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() < min){
+                                min = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                            }
+                        }
+                    }
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), imageFiltered.pixelColor(i, j).green(), min));
+                }
+            }
+        }else if (channel == ALL){ // Minimun filter for the ALL channels
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int minR = 255;
+                    int minG = 255;
+                    int minB = 255;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() < minR){
+                                minR = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                            }
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() < minG){
+                                minG = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                            }
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() < minB){
+                                minB = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                            }
+                        }
+                    }
+                    imageFiltered.setPixel(i, j, qRgb(minR, minG, minB));
+                }
             }
         }
+
     }else if(ui->comboConvolution->currentIndex() == 2){ // Maximum filter
         int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
-
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
         int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int max = 0;
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
-                        if(QColor(imageChanelR.pixel(i - middle + x, j - middle + y)).red() > max){
-                            max = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+
+        if(channel == RED){ // Maximun filter for the RED channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int max = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() > max){
+                                max = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                            }
                         }
                     }
+                    imageFiltered.setPixel(i, j, qRgb(max, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
                 }
-                imageFiltered.setPixel(i, j, qRgb(max, max, max));
+            }
+        }else if(channel == GREEN){ // Maximum filter for the GREEN channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int max = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() > max){
+                                max = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                            }
+                        }
+                    }
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), max, imageFiltered.pixelColor(i, j).blue()));
+                }
+            }
+        }else if (channel == BLUE){ // Maximum filter for the BLUE channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int max = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() > max){
+                                max = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                            }
+                        }
+                    }
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), imageFiltered.pixelColor(i, j).green(), max));
+                }
+            }
+        }else if(channel == ALL){ // Maximum filter for ALL channels
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int maxR = 0;
+                    int maxG = 0;
+                    int maxB = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() > maxR){
+                                maxR = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                            }
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() > maxG){
+                                maxG = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                            }
+                            if(QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() > maxB){
+                                maxB = QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                            }
+                        }
+                    }
+                    imageFiltered.setPixel(i, j, qRgb(maxR, maxG, maxB));
+                }
             }
         }
+
     }else if(ui->comboConvolution->currentIndex() == 3){ // Middle filter
         int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
 
-            int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        if(transform == GRAYSCALE){
+
+        if(channel == RED){ // Middle filter for the RED channel
             for(int i = middle; i < w - middle; i++){
                 for(int j = middle; j < h - middle; j++){
                     int pixel = 0;
@@ -321,70 +486,211 @@ void Conversor::on_buttonApplyConvolution_clicked()
                     for(int x = 0; x < kernelSize; x++){
                         for(int y = 0; y < kernelSize; y++){
                             list << QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
-
                         }
                     }
-
                     qSort(list.begin(), list.end());
                     pixel = list.at(list.length() / 2);
-                    imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+                    imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
                 }
             }
-        }else{
+        }else if(channel == GREEN){ // Middle filter for the GREEN channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    QList<int> list;
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            list << QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                        }
+                    }
+                    qSort(list.begin(), list.end());
+                    pixel = list.at(list.length() / 2);
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), pixel, imageFiltered.pixelColor(i, j).blue()));
+                }
+            }
+        }else if(channel == BLUE){ // Middle filter for the BLUE channel
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    QList<int> list;
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            list << QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                        }
+                    }
+                    qSort(list.begin(), list.end());
+                    pixel = list.at(list.length() / 2);
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), imageFiltered.pixelColor(i, j).green(), pixel));
+                }
+            }
+        }else if(channel == ALL){ // middle filter for ALL channels
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixelR = 0;
+                    int pixelG = 0;
+                    int pixelB = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    QList<int> listR;
+                    QList<int> listG;
+                    QList<int> listB;
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            listR << QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
+                            listG << QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green();
+                            listB << QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue();
+                        }
+                    }
+                    qSort(listR.begin(), listR.end());
+                    qSort(listG.begin(), listG.end());
+                    qSort(listB.begin(), listB.end());
+                    pixelR = listR.at(listR.length() / 2);
+                    pixelG = listG.at(listG.length() / 2);
+                    pixelB = listB.at(listB.length() / 2);
+
+                    imageFiltered.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+                }
+            }
+        }
+    }else if(ui->comboConvolution->currentIndex() == 4){ // Gaussian filter x3
+        int commonFilter[3][3] = {{1,2,1},{2,4,2},{1,2,1}};
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        if(channel == RED){
             for(int i = middle; i < w - middle; i++){
                 for(int j = middle; j < h - middle; j++){
                     int pixel = 0;
                     int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
                     for(int x = 0; x < kernelSize; x++){
                         for(int y = 0; y < kernelSize; y++){
-
-                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red();
-
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
                         }
                     }
-                    pixel = pixel / (kernelSize * kernelSize);
-                    imageFiltered.setPixel(i, j, qRgb(pixel, QColor(imageFiltered.pixel(i, j)).green(), QColor(imageFiltered.pixel(i, j)).blue()));
+                    pixel = pixel / 16;
+                    imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
                 }
             }
-        }
-    }else if(ui->comboConvolution->currentIndex() == 4){ // Gaussian filter x3
-        int commonFilter[3][3] = {{1,2,1},{2,4,2},{1,2,1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
-
-        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int pixel = 0;
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
-                        pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+        }else if (channel == GREEN){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter[x][y];
+                        }
                     }
+                    pixel = pixel / 16;
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), pixel, imageFiltered.pixelColor(i, j).blue()));
                 }
-                pixel = pixel / 16;
-                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+            }
+        }else if (channel == BLUE){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter[x][y];
+                        }
+                    }
+                    pixel = pixel / 16;
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), imageFiltered.pixelColor(i, j).green(), pixel));
+                }
+            }
+        }else if(channel = ALL){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixelR = 0;
+                    int pixelG = 0;
+                    int pixelB = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+                            pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter[x][y];
+                            pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter[x][y];
+                        }
+                    }
+                    pixelR = pixelR / 16;
+                    pixelG = pixelG / 16;
+                    pixelB = pixelB / 16;
+                    imageFiltered.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+                }
             }
         }
+
     }else if(ui->comboConvolution->currentIndex() == 5){ // Gaussian filter x5
         int commonFilter[5][5] = {{1, 4, 7, 4, 1},{4, 16, 26, 16, 4},{7, 26, 41, 26, 7}, {4, 16, 26, 16, 4}, {1, 4, 7, 4, 1}};
-        int w = imageChanelR.width();
-        int h = imageChanelR.height();
-
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
         int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int pixel = 0;
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
-                        pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+        if(channel == RED){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+                        }
                     }
+                    pixel = pixel / 273;
+                    imageFiltered.setPixel(i, j, qRgb(pixel, imageFiltered.pixelColor(i, j).green(), imageFiltered.pixelColor(i, j).blue()));
                 }
-                pixel = pixel / 273;
-                imageFiltered.setPixel(i, j, qRgb(pixel, pixel, pixel));
+            }
+        }else if(channel == GREEN){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter[x][y];
+                        }
+                    }
+                    pixel = pixel / 273;
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), pixel, imageFiltered.pixelColor(i, j).blue()));
+                }
+            }
+        }else if(channel == BLUE){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixel = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixel += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter[x][y];
+                        }
+                    }
+                    pixel = pixel / 273;
+                    imageFiltered.setPixel(i, j, qRgb(imageFiltered.pixelColor(i, j).red(), imageFiltered.pixelColor(i, j).green(), pixel));
+                }
+            }
+        }else if(channel == ALL){
+            for(int i = middle; i < w - middle; i++){
+                for(int j = middle; j < h - middle; j++){
+                    int pixelR = 0;
+                    int pixelG = 0;
+                    int pixelB = 0;
+                    int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+                            pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter[x][y];
+                            pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter[x][y];
+                        }
+                    }
+                    pixelR = pixelR / 273;
+                    pixelG = pixelG / 273;
+                    pixelB = pixelB / 273;
+                    imageFiltered.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+                }
             }
         }
+
     }
 
 

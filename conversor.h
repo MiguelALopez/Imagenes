@@ -27,6 +27,10 @@ public:
         RGB, GRAYSCALE, HSV, HSL, OPPONENT, CMY, INVERTIDOS
     }TypeTransform;
 
+    typedef enum{
+        RED, GREEN, BLUE, ALL
+    }ChannelFilter;
+
 private slots:
     void on_buttonLoad_clicked();
     void on_buttonConvert_clicked();
@@ -49,6 +53,7 @@ private:
     QImage imageFiltered;
 
     TypeTransform transform;
+    ChannelFilter channel;
 };
 
 #endif // CONVERSOR_H
