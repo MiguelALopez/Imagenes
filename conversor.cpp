@@ -741,19 +741,48 @@ void Conversor::on_buttonApplyContrast_clicked(){
             }
         }
     }else if(ui->comboContrast->currentIndex() == 1){ // Histogram equalization
-        double rate = 2.0;
+        int histogramR[256];
+        int histogramG[256];
+        int histogramB[256];
         int w = imageChoosed.width();
         int h = imageChoosed.height();
 
+        for(int i = 0; i < 256; i++){
+            histogramR[i] = 0;
+            histogramG[i] = 0;
+            histogramB[i] = 0;
+        }
+
         for(int i = 0; i < w ; i++){
             for(int j = 0; j < h; j++){
-                double pixelR = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).red()) / 255.0, rate);
-                double pixelG = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).green()) / 255.0, rate);
-                double pixelB = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).blue()) / 255.0, rate);
-
-                imageContrast.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+                histogramR[QColor(imageChoosed.pixel(i, j)).red()]++;
+                histogramG[QColor(imageChoosed.pixel(i, j)).green()]++;
+                histogramB[QColor(imageChoosed.pixel(i, j)).blue()]++;
             }
         }
+
+        for(int i = 1; i < 256; i++){
+            histogramR[i] += histogramR[i-1];
+            histogramG[i] += histogramG[i-1];
+            histogramB[i] += histogramB[i-1];
+        }
+
+        for(int i = 0; i < 256; i++){
+            histogramR[i] = round(((255.0)/(double(w*h)))*histogramR[i]);
+            histogramG[i] = round(((255.0)/(double(w*h)))*histogramG[i]);
+            histogramB[i] = round(((255.0)/(double(w*h)))*histogramB[i]);
+        }
+
+        for(int i = 0; i < w ; i++){
+            for(int j = 0; j < h; j++){
+                int pixelR = histogramR[QColor(imageChoosed.pixel(i, j)).red()];
+                int pixelG = histogramG[QColor(imageChoosed.pixel(i, j)).green()];
+                int pixelB = histogramB[QColor(imageChoosed.pixel(i, j)).blue()];
+
+                imageContrast.setPixel(i, j, qRgb(pixelR, pixelR, pixelR));
+            }
+        }
+
 
     }else if(ui->comboContrast->currentIndex() == 2){ // Contrast stretching
         int w = imageChoosed.width();
@@ -767,8 +796,8 @@ void Conversor::on_buttonApplyContrast_clicked(){
         double minG = 255;
         double minB = 255;
 
-        double = newMax = 255;
-        double = newMin = 0;
+        double newMax = 255;
+        double newMin = 0;
 
         for(int i = 0; i < w ; i++){
             for(int j = 0; j < h; j++){
@@ -801,7 +830,7 @@ void Conversor::on_buttonApplyContrast_clicked(){
             for(int j = 0; j < h; j++){
                 double pixelR = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMax - newMin)/(maxR - minR))) + newMin;
                 double pixelG = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMax - newMin)/(maxR - minR))) + newMin;
-                double pixelB = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMaz - newMin)/(maxR - minR))) + newMin;
+                double pixelB = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMax - newMin)/(maxR - minR))) + newMin;
                 imageContrast.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
             }
         }
