@@ -52,7 +52,8 @@ private:
     QImage imageChanelG;
     QImage imageChanelB;
     QImage imageChoosed;
-    QImage imageFiltered;
+    QImage imageConvolution;
+    QImage imageContrast;
 
     TypeTransform transform;
     ChannelFilter channel;
