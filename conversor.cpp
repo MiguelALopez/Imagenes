@@ -21,31 +21,39 @@ void Conversor::resizeEvent(QResizeEvent * event){
     QMainWindow::resizeEvent(event);
     if(!imageOriginal.isNull()){ // Redimenciona el campo de la imagen origina
         int w = ui->labelImageOriginal->width();
-        int h = ui->labelImageOriginal->width();
+        int h = ui->labelImageOriginal->height();
         ui->labelImageOriginal->setPixmap(QPixmap::fromImage(imageOriginal).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageOriginal->setStyleSheet("border: 0px solid");
     }
 
     if(!imageTrasformada.isNull()){ // Redimenciona el campo de la imagen trasformada
         int w = ui->labelImageTransformed->width();
-        int h = ui->labelImageTransformed->width();
+        int h = ui->labelImageTransformed->height();
         ui->labelImageTransformed->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageTransformed->setStyleSheet("border: 0px solid");
     }
 
+    if(!imageChoosed.isNull()){
+            int w = ui->labelImageConvOrig->width();
+            int h = ui->labelImageConvOrig->height();
+            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+
+            ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+    }
+
     if(!imageConvolution.isNull()){ // Redimenciona el campo de la imagen con el filtro
         int w = ui->labelImageConvFilt->width();
-        int h = ui->labelImageConvFilt->width();
+        int h = ui->labelImageConvFilt->height();
         ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageConvolution).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
     }
 
-    if(!imageChoosed.isNull()){
-            int w = ui->labelImageConvOrig->width();
-            int h = ui->labelImageConvOrig->width();
-            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+    if(!imageContrast.isNull()){ // Redimenciona el campo de la imagen con el nuevo contraste
+
     }
+
 }
 
 void Conversor::on_tabWidget_currentChanged(int index)
@@ -247,10 +255,10 @@ void Conversor::on_buttonSelectChannel_clicked()
         channel = BLUE;
 
     }else if(ui->comboChannel->currentIndex() == 3){ // All the channels
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageConvolution).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
 
-        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageConvolution).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
         imageChoosed = imageTrasformada;
         channel = ALL;
@@ -612,7 +620,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                     imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), pixel));
                 }
             }
-        }else if(channel = ALL){
+        }else if(channel == ALL){
             for(int i = middle; i < w - middle; i++){
                 for(int j = middle; j < h - middle; j++){
                     int pixelR = 0;
@@ -716,5 +724,91 @@ void Conversor::on_buttonApplyConvolution_clicked(){
 
 
 void Conversor::on_buttonApplyContrast_clicked(){
+    imageContrast = imageChoosed;
 
+    if(ui->comboContrast->currentIndex() == 0){ // Gamma correction
+        double rate = 2.0;
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+
+        for(int i = 0; i < w ; i++){
+            for(int j = 0; j < h; j++){
+                double pixelR = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).red()) / 255.0, rate);
+                double pixelG = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).green()) / 255.0, rate);
+                double pixelB = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).blue()) / 255.0, rate);
+
+                imageContrast.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+            }
+        }
+    }else if(ui->comboContrast->currentIndex() == 1){ // Histogram equalization
+        double rate = 2.0;
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+
+        for(int i = 0; i < w ; i++){
+            for(int j = 0; j < h; j++){
+                double pixelR = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).red()) / 255.0, rate);
+                double pixelG = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).green()) / 255.0, rate);
+                double pixelB = 255.0 * pow(double(QColor(imageChoosed.pixel(i, j)).blue()) / 255.0, rate);
+
+                imageContrast.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+            }
+        }
+
+    }else if(ui->comboContrast->currentIndex() == 2){ // Contrast stretching
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+
+        double maxR = 0;
+        double maxG = 0;
+        double maxB = 06;
+
+        double minR = 255;
+        double minG = 255;
+        double minB = 255;
+
+        double = newMax = 255;
+        double = newMin = 0;
+
+        for(int i = 0; i < w ; i++){
+            for(int j = 0; j < h; j++){
+                if(QColor(imageChoosed.pixel(i, j)).red() > maxR){
+                    maxR = double(QColor(imageChoosed.pixel(i, j)).red());
+                }
+                if(QColor(imageChoosed.pixel(i, j)).green() > maxG){
+                    maxG = double(QColor(imageChoosed.pixel(i, j)).green());
+                }
+                if(QColor(imageChoosed.pixel(i, j)).blue() > maxB){
+                    maxB = double(QColor(imageChoosed.pixel(i, j)).blue());
+                }
+
+
+                if(QColor(imageChoosed.pixel(i, j)).red() < minR){
+                    minR = double(QColor(imageChoosed.pixel(i, j)).red());
+                }
+                if(QColor(imageChoosed.pixel(i, j)).green() < minG){
+                    minG = double(QColor(imageChoosed.pixel(i, j)).green());
+                }
+                if(QColor(imageChoosed.pixel(i, j)).blue() < minB){
+                    minB = double(QColor(imageChoosed.pixel(i, j)).blue());
+                }
+            }
+        }
+
+        std::cout << "min " << minR << " max " << maxR << std::endl;
+
+        for(int i = 0; i < w; i++){
+            for(int j = 0; j < h; j++){
+                double pixelR = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMax - newMin)/(maxR - minR))) + newMin;
+                double pixelG = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMax - newMin)/(maxR - minR))) + newMin;
+                double pixelB = ((double(QColor(imageChoosed.pixel(i, j)).red()) - minR) * ((newMaz - newMin)/(maxR - minR))) + newMin;
+                imageContrast.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
+            }
+        }
+    }
+
+    int wx = ui->labelImageContTrans->width();
+    int hx = ui->labelImageContTrans->height();
+    ui->labelImageContTrans->setPixmap(QPixmap::fromImage(imageContrast).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageContTrans->setStyleSheet("border: 0px solid");
 }

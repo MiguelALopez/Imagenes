@@ -8,6 +8,7 @@
 #include <QRgb>
 #include <iostream>
 #include <math.h>
+#include <QtCharts>
 
 namespace Ui {
 class Conversor;
