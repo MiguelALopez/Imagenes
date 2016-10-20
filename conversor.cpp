@@ -45,7 +45,7 @@ void Conversor::resizeEvent(QResizeEvent * event){
             int h = ui->labelImageConvOrig->width();
             ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
             ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-        }
+    }
 }
 
 void Conversor::on_tabWidget_currentChanged(int index)
@@ -222,24 +222,36 @@ void Conversor::on_buttonSelectChannel_clicked()
     if (ui->comboChannel->currentIndex() == 0){ // Channel 1
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
         imageChoosed = imageChanelR;
         channel = RED;
 
     }else if (ui->comboChannel->currentIndex() == 1){ // Channel 2
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
         imageChoosed = imageChanelG;
         channel = GREEN;
 
     }else if(ui->comboChannel->currentIndex() == 2){ // Chanel 3
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
         imageChoosed = imageChanelB;
         channel = BLUE;
 
     }else if(ui->comboChannel->currentIndex() == 3){ // All the channels
         ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageFiltered).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageFiltered).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
         imageChoosed = imageTrasformada;
         channel = ALL;
     }
@@ -702,3 +714,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
 }
 
 
+
+void Conversor::on_buttonApplyContrast_clicked(){
+
+}

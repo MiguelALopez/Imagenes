@@ -42,6 +42,8 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_buttonApplyContrast_clicked();
+
 private:
     Ui::Conversor *ui;
     QImage imageOriginal;
