@@ -233,6 +233,10 @@ void Conversor::on_buttonSelectChannel_clicked()
 
         ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+
         imageChoosed = imageChanelR;
         channel = RED;
 
@@ -242,6 +246,10 @@ void Conversor::on_buttonSelectChannel_clicked()
 
         ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+
         imageChoosed = imageChanelG;
         channel = GREEN;
 
@@ -251,6 +259,10 @@ void Conversor::on_buttonSelectChannel_clicked()
 
         ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+
         imageChoosed = imageChanelB;
         channel = BLUE;
 
@@ -260,6 +272,10 @@ void Conversor::on_buttonSelectChannel_clicked()
 
         ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+
         imageChoosed = imageTrasformada;
         channel = ALL;
     }
@@ -727,7 +743,7 @@ void Conversor::on_buttonApplyContrast_clicked(){
     imageContrast = imageChoosed;
 
     if(ui->comboContrast->currentIndex() == 0){ // Gamma correction
-        double rate = 2.0;
+        double rate = 0.6;
         int w = imageChoosed.width();
         int h = imageChoosed.height();
 
@@ -840,4 +856,39 @@ void Conversor::on_buttonApplyContrast_clicked(){
     int hx = ui->labelImageContTrans->height();
     ui->labelImageContTrans->setPixmap(QPixmap::fromImage(imageContrast).scaled(wx, hx, Qt::KeepAspectRatio));
     ui->labelImageContTrans->setStyleSheet("border: 0px solid");
+}
+
+void Conversor::on_applyEdges_clicked(){
+    imageEdges = imageChoosed;
+
+    if(ui->comboEdges->currentIndex() == 0){ // sobel
+        int commonFilter[3][3] = {{-1,-2,-3},{0,0,0},{1,2,3}};
+        int commonFilter2[3][3] = {{-1,0,1},{-2,0,2},{-3,0,3}};
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+
+        for(int i = middle; i < w - middle; i++){
+            for(int j = middle; j < h - middle; j++){
+                int pixelR = 0;
+                int pixelG = 0;
+                int pixelB = 0;
+
+                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+                for(int x = 0; x < kernelSize; x++){
+                    for(int y = 0; y < kernelSize; y++){
+                        pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+                        pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter[x][y];
+                        pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter[x][y];
+
+                        pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter2[x][y];
+                        pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter2[x][y];
+                        pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter2[x][y];
+                    }
+                }
+                //pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
+                imageConvolution.setPixel(i, j, qRgb(pixel,pixel, pixel);
+            }
+        }
+    }
 }

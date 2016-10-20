@@ -45,6 +45,8 @@ private slots:
 
     void on_buttonApplyContrast_clicked();
 
+    void on_applyEdges_clicked();
+
 private:
     Ui::Conversor *ui;
     QImage imageOriginal;
@@ -55,6 +57,7 @@ private:
     QImage imageChoosed;
     QImage imageConvolution;
     QImage imageContrast;
+    QImage imageEdges;
 
     TypeTransform transform;
     ChannelFilter channel;
