@@ -284,7 +284,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
-                    imageConvolution.setPixel(i, j, qRgb(pixel, imageConvolution.pixelColor(i, j).green(), imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(pixel, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == BLUE){ // Average filter for the GREEN channel
@@ -298,7 +298,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), pixel, imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), pixel, QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == GREEN){ // Average filter for the BLUE channel
@@ -312,7 +312,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), pixel));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), pixel));
                 }
             }
         }else if(channel == ALL){ // Average filter for ALL channels
@@ -356,7 +356,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                             }
                         }
                     }
-                    imageConvolution.setPixel(i, j, qRgb(min, imageConvolution.pixelColor(i, j).green(), imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(min, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         } else if (channel == GREEN){ // Minumun filter for the GREEN channel
@@ -371,7 +371,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                             }
                         }
                     }
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), min, imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), min, QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if (channel == BLUE){ // Minimun filter for the BLUE channel
@@ -386,7 +386,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                             }
                         }
                     }
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), min));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), min));
                 }
             }
         }else if (channel == ALL){ // Minimun filter for the ALL channels
@@ -432,7 +432,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                             }
                         }
                     }
-                    imageConvolution.setPixel(i, j, qRgb(max, imageConvolution.pixelColor(i, j).green(), imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(max, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == GREEN){ // Maximum filter for the GREEN channel
@@ -447,7 +447,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                             }
                         }
                     }
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), max, imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), max, QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if (channel == BLUE){ // Maximum filter for the BLUE channel
@@ -462,7 +462,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                             }
                         }
                     }
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), max));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), max));
                 }
             }
         }else if(channel == ALL){ // Maximum filter for ALL channels
@@ -510,7 +510,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                     }
                     qSort(list.begin(), list.end());
                     pixel = list.at(list.length() / 2);
-                    imageConvolution.setPixel(i, j, qRgb(pixel, imageConvolution.pixelColor(i, j).green(), imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(pixel, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == GREEN){ // Middle filter for the GREEN channel
@@ -526,7 +526,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                     }
                     qSort(list.begin(), list.end());
                     pixel = list.at(list.length() / 2);
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), pixel, imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), pixel, QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == BLUE){ // Middle filter for the BLUE channel
@@ -542,7 +542,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                     }
                     qSort(list.begin(), list.end());
                     pixel = list.at(list.length() / 2);
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), pixel));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), pixel));
                 }
             }
         }else if(channel == ALL){ // middle filter for ALL channels
@@ -589,7 +589,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / 16;
-                    imageConvolution.setPixel(i, j, qRgb(pixel, imageConvolution.pixelColor(i, j).green(), imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(pixel, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if (channel == GREEN){
@@ -603,7 +603,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / 16;
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), pixel, imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), pixel, QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if (channel == BLUE){
@@ -617,7 +617,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / 16;
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), pixel));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), pixel));
                 }
             }
         }else if(channel == ALL){
@@ -658,7 +658,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / 273;
-                    imageConvolution.setPixel(i, j, qRgb(pixel, imageConvolution.pixelColor(i, j).green(), imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(pixel, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == GREEN){
@@ -672,7 +672,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / 273;
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), pixel, imageConvolution.pixelColor(i, j).blue()));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), pixel, QColor(imageConvolution.pixel(i, j)).blue()));
                 }
             }
         }else if(channel == BLUE){
@@ -686,7 +686,7 @@ void Conversor::on_buttonApplyConvolution_clicked(){
                         }
                     }
                     pixel = pixel / 273;
-                    imageConvolution.setPixel(i, j, qRgb(imageConvolution.pixelColor(i, j).red(), imageConvolution.pixelColor(i, j).green(), pixel));
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), pixel));
                 }
             }
         }else if(channel == ALL){
@@ -779,7 +779,7 @@ void Conversor::on_buttonApplyContrast_clicked(){
                 int pixelG = histogramG[QColor(imageChoosed.pixel(i, j)).green()];
                 int pixelB = histogramB[QColor(imageChoosed.pixel(i, j)).blue()];
 
-                imageContrast.setPixel(i, j, qRgb(pixelR, pixelR, pixelR));
+                imageContrast.setPixel(i, j, qRgb(pixelR, pixelG, pixelB));
             }
         }
 
