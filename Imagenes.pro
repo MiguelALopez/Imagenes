@@ -6,15 +6,18 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = Imagenes
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        conversor.cpp
+        conversor.cpp \
+    qcustomplot.cpp
 
-HEADERS  += conversor.h
+HEADERS  += conversor.h \
+    convolution.h \
+    qcustomplot.h
 
 FORMS    += conversor.ui

@@ -16,36 +16,41 @@ Conversor::~Conversor()
     delete ui;
 }
 
-// Evento encargado de capturar el redimencinamiento de la ventana
-void Conversor::resizeEvent(QResizeEvent * event){
-    QMainWindow::resizeEvent(event);
+void Conversor::resizeWindow(){
     if(!imageOriginal.isNull()){ // Redimenciona el campo de la imagen origina
         int w = ui->labelImageOriginal->width();
-        int h = ui->labelImageOriginal->height();
+        int h = ui->labelImageOriginal->width();
         ui->labelImageOriginal->setPixmap(QPixmap::fromImage(imageOriginal).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageOriginal->setStyleSheet("border: 0px solid");
     }
 
     if(!imageTrasformada.isNull()){ // Redimenciona el campo de la imagen trasformada
         int w = ui->labelImageTransformed->width();
-        int h = ui->labelImageTransformed->height();
+        int h = ui->labelImageTransformed->width();
         ui->labelImageTransformed->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageTransformed->setStyleSheet("border: 0px solid");
     }
 
     if(!imageChoosed.isNull()){
             int w = ui->labelImageConvOrig->width();
-            int h = ui->labelImageConvOrig->height();
+            int h = ui->labelImageConvOrig->width();
+
+            // Imagen convolucion original
             ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
             ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
 
+            // Imagen Contraste original
             ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
             ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+
+            // Imagen Bordes original
+            ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+            ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
     }
 
     if(!imageConvolution.isNull()){ // Redimenciona el campo de la imagen con el filtro
         int w = ui->labelImageConvFilt->width();
-        int h = ui->labelImageConvFilt->height();
+        int h = ui->labelImageConvFilt->width();
         ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageConvolution).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
     }
@@ -54,18 +59,23 @@ void Conversor::resizeEvent(QResizeEvent * event){
 
     }
 
+    if(!imageEdges.isNull()){
+        int w = ui->labelImageEdgTrasf->width();
+        int h = ui->labelImageEdgTrasf->width();
+        ui->labelImageEdgTrasf->setPixmap(QPixmap::fromImage(imageEdges).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgTrasf->setStyleSheet("border: 0px solid");
+    }
 }
 
-void Conversor::on_tabWidget_currentChanged(int index)
-{
-    if(index == 1){
-            if(!imageChoosed.isNull()){
-                int w = ui->labelImageConvOrig->width();
-                int h = ui->labelImageConvOrig->width();
-                ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
-                ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
-            }
-        }
+// Evento encargado de capturar el redimencinamiento de la ventana
+void Conversor::resizeEvent(QResizeEvent * event){
+    QMainWindow::resizeEvent(event);
+    resizeWindow();
+
+}
+
+void Conversor::on_tabWidget_currentChanged(int index){
+   resizeWindow();
 }
 
 // Evento encargado de cargar la imagen desde una ubicacion
@@ -278,6 +288,18 @@ void Conversor::on_buttonSelectChannel_clicked()
 
         imageChoosed = imageTrasformada;
         channel = ALL;
+    }else if(ui->comboChannel->currentIndex() == 4){ // Grey scale
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+
+        imageChoosed = imageTrasformada;
+        channel = GREY;
     }
 }
 // Evento encargado de hacer la convolucion
@@ -727,6 +749,498 @@ void Conversor::on_buttonApplyConvolution_clicked(){
             }
         }
 
+    }else if(ui->comboConvolution->currentIndex() == 6){ // Nagao filter
+        int nagaoW[5][5] = {{1,0,0,0,0},
+                            {1,1,0,0,0},
+                            {1,1,1,0,0},
+                            {1,1,0,0,0},
+                            {1,0,0,0,0}};
+
+        int nagaoNW[5][5] = {{1,1,1,0,0},
+                             {1,1,1,0,0},
+                             {1,1,1,0,0},
+                             {0,0,0,0,0},
+                             {0,0,0,0,0}};
+
+        int nagaoN[5][5] = {{1,1,1,1,1},
+                            {0,1,1,1,0},
+                            {0,0,1,0,0},
+                            {0,0,0,0,0},
+                            {0,0,0,0,0}};
+
+        int nagaoNE[5][5] = {{0,0,1,1,1},
+                             {0,0,1,1,1},
+                             {0,0,1,1,1},
+                             {0,0,0,0,0},
+                             {0,0,0,0,0}};
+
+        int nagaoE[5][5] = {{0,0,0,0,1},
+                            {0,0,0,1,1},
+                            {0,0,1,1,1},
+                            {0,0,0,1,1},
+                            {0,0,0,0,1}};
+
+        int nagaoSE[5][5] = {{0,0,0,0,0},
+                             {0,0,0,0,0},
+                             {0,0,1,1,1},
+                             {0,0,1,1,1},
+                             {0,0,1,1,1}};
+
+        int nagaoS[5][5] = {{0,0,0,0,0},
+                            {0,0,0,0,0},
+                            {0,0,1,0,0},
+                            {0,1,1,1,0},
+                            {1,1,1,1,1}};
+
+        int nagaoSW[5][5] = {{0,0,0,0,0},
+                             {0,0,0,0,0},
+                             {1,1,1,0,0},
+                             {1,1,1,0,0},
+                             {1,1,1,0,0}};
+
+        int nagaoC[5][5] = {{0,0,0,0,0},
+                            {0,1,1,1,0},
+                            {0,1,1,1,0},
+                            {0,1,1,1,0},
+                            {0,0,0,0,0}};
+
+
+
+        int w = imageChoosed.width();
+        int h = imageChoosed.height();
+        int middleNagao = (sizeof(nagaoC) / sizeof(*nagaoC)) / 2;
+
+        if (channel == RED){ // Nagao filter for the RED channel
+            for(int i = middleNagao; i < w - middleNagao; i++){
+                for(int j = middleNagao; j < h - middleNagao; j++){
+
+                    int pixelW = 0; int pixelAverW = 0;
+                    int pixelNW = 0; int pixelAverNW = 0;
+                    int pixelN = 0; int pixelAverN = 0;
+                    int pixelNE = 0; int pixelAverNE = 0;
+                    int pixelE = 0; int pixelAverE = 0;
+                    int pixelSE = 0; int pixelAverSE = 0;
+                    int pixelS = 0; int pixelAverS = 0;
+                    int pixelSW = 0; int pixelAverSW = 0;
+                    int pixelC = 0; int pixelAverC = 0;
+
+                    int kernelSize = sizeof(nagaoC) / sizeof(*nagaoC);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoW[x][y], 2);
+                            pixelAverW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoW[x][y];
+
+                            pixelNW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNW[x][y], 2);
+                            pixelAverNW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNW[x][y];
+
+                            pixelN += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoN[x][y], 2);
+                            pixelAverN += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoN[x][y];
+
+                            pixelNE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNE[x][y], 2);
+                            pixelAverNE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNE[x][y];
+
+                            pixelE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoE[x][y], 2);
+                            pixelAverE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoE[x][y];
+
+                            pixelSE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSE[x][y], 2);
+                            pixelAverSE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSE[x][y];
+
+                            pixelS += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoS[x][y], 2);
+                            pixelAverS += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoS[x][y];
+
+                            pixelSW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSW[x][y], 2);
+                            pixelAverSW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSW[x][y];
+
+                            pixelC += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoC[x][y], 2);
+                            pixelAverC += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoC[x][y];
+                        }
+                    }
+                    double varPixelW = (double(pixelW)/9.0) - pow(double(pixelAverW)/9.0, 2);
+                    double varPixelNW = (double(pixelNW)/9.0) - pow(double(pixelAverNW)/9.0, 2);
+                    double varPixelN = (double(pixelN)/9.0)- pow(double(pixelAverN)/9.0, 2);
+                    double varPixelNE = (double(pixelNE)/9.0) - pow(double(pixelAverNE)/9.0, 2);
+                    double varPixelE = (double(pixelE)/9.0) - pow(double(pixelAverE)/9.0, 2);
+                    double varPixelSE = (double(pixelSE)/9.0) - pow(double(pixelAverSE)/9.0, 2);
+                    double varPixelS = (double(pixelS)/9.0) - pow(double(pixelAverS)/9.0, 2);
+                    double varPixelSW = (double(pixelSW)/9.0) - pow(double(pixelAverSW)/9.0, 2);
+                    double varPixelC = (double(pixelC)/9.0) - pow(double(pixelAverC)/9.0, 2);
+
+                    double array[9] = {varPixelW, varPixelNW, varPixelN, varPixelNE, varPixelE, varPixelSE, varPixelS, varPixelSW, varPixelC};
+                    double minVar = varPixelW;
+                    for(int i = 1; i < 9; i++){
+                        if(array[i] < minVar){
+                            minVar = array[i];
+                        }
+                    }
+                    int pixel = 255;
+                    if(minVar == varPixelW){
+                        pixel = pixelAverW / 9;
+                    }else if(minVar == varPixelNW){
+                        pixel = pixelAverNW / 9;
+                    }else if(minVar == varPixelN){
+                        pixel = pixelAverN / 9;
+                    }else if (minVar == varPixelNE){
+                        pixel = pixelAverNE / 9;
+                    }else if (minVar == varPixelE){
+                        pixel = pixelAverE / 9;
+                    }else if (minVar == varPixelSE){
+                        pixel = pixelAverSE / 9;
+                    }else if (minVar == varPixelS){
+                        pixel = pixelAverS / 9;
+                    }else if (minVar == varPixelSW){
+                        pixel = pixelAverSW / 9;
+                    }else if (minVar == varPixelC){
+                        pixel = pixelAverC / 9;
+                    }
+                    imageConvolution.setPixel(i, j, qRgb(pixel, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
+                }
+            }
+        }else if (channel == GREEN){ // Nagao filter for the GREEN channel
+            for(int i = middleNagao; i < w - middleNagao; i++){
+                for(int j = middleNagao; j < h - middleNagao; j++){
+
+                    int pixelW = 0; int pixelAverW = 0;
+                    int pixelNW = 0; int pixelAverNW = 0;
+                    int pixelN = 0; int pixelAverN = 0;
+                    int pixelNE = 0; int pixelAverNE = 0;
+                    int pixelE = 0; int pixelAverE = 0;
+                    int pixelSE = 0; int pixelAverSE = 0;
+                    int pixelS = 0; int pixelAverS = 0;
+                    int pixelSW = 0; int pixelAverSW = 0;
+                    int pixelC = 0; int pixelAverC = 0;
+
+                    int kernelSize = sizeof(nagaoC) / sizeof(*nagaoC);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoW[x][y], 2);
+                            pixelAverW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoW[x][y];
+
+                            pixelNW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoNW[x][y], 2);
+                            pixelAverNW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoNW[x][y];
+
+                            pixelN += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoN[x][y], 2);
+                            pixelAverN += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoN[x][y];
+
+                            pixelNE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoNE[x][y], 2);
+                            pixelAverNE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoNE[x][y];
+
+                            pixelE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoE[x][y], 2);
+                            pixelAverE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoE[x][y];
+
+                            pixelSE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoSE[x][y], 2);
+                            pixelAverSE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoSE[x][y];
+
+                            pixelS += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoS[x][y], 2);
+                            pixelAverS += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoS[x][y];
+
+                            pixelSW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoSW[x][y], 2);
+                            pixelAverSW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoSW[x][y];
+
+                            pixelC += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoC[x][y], 2);
+                            pixelAverC += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).green() * nagaoC[x][y];
+                        }
+                    }
+                    double varPixelW = (double(pixelW)/9.0) - pow(double(pixelAverW)/9.0, 2);
+                    double varPixelNW = (double(pixelNW)/9.0) - pow(double(pixelAverNW)/9.0, 2);
+                    double varPixelN = (double(pixelN)/9.0)- pow(double(pixelAverN)/9.0, 2);
+                    double varPixelNE = (double(pixelNE)/9.0) - pow(double(pixelAverNE)/9.0, 2);
+                    double varPixelE = (double(pixelE)/9.0) - pow(double(pixelAverE)/9.0, 2);
+                    double varPixelSE = (double(pixelSE)/9.0) - pow(double(pixelAverSE)/9.0, 2);
+                    double varPixelS = (double(pixelS)/9.0) - pow(double(pixelAverS)/9.0, 2);
+                    double varPixelSW = (double(pixelSW)/9.0) - pow(double(pixelAverSW)/9.0, 2);
+                    double varPixelC = (double(pixelC)/9.0) - pow(double(pixelAverC)/9.0, 2);
+
+                    double array[9] = {varPixelW, varPixelNW, varPixelN, varPixelNE, varPixelE, varPixelSE, varPixelS, varPixelSW, varPixelC};
+                    double minVar = varPixelW;
+                    for(int i = 1; i < 9; i++){
+                        if(array[i] < minVar){
+                            minVar = array[i];
+                        }
+                    }
+                    int pixel = 255;
+                    if(minVar == varPixelW){
+                        pixel = pixelAverW / 9;
+                    }else if(minVar == varPixelNW){
+                        pixel = pixelAverNW / 9;
+                    }else if(minVar == varPixelN){
+                        pixel = pixelAverN / 9;
+                    }else if (minVar == varPixelNE){
+                        pixel = pixelAverNE / 9;
+                    }else if (minVar == varPixelE){
+                        pixel = pixelAverE / 9;
+                    }else if (minVar == varPixelSE){
+                        pixel = pixelAverSE / 9;
+                    }else if (minVar == varPixelS){
+                        pixel = pixelAverS / 9;
+                    }else if (minVar == varPixelSW){
+                        pixel = pixelAverSW / 9;
+                    }else if (minVar == varPixelC){
+                        pixel = pixelAverC / 9;
+                    }
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), pixel, QColor(imageConvolution.pixel(i, j)).blue()));
+                }
+            }
+        }else if (channel == BLUE){ // Nagao filter for the BLUE channel
+            for(int i = middleNagao; i < w - middleNagao; i++){
+                for(int j = middleNagao; j < h - middleNagao; j++){
+
+                    int pixelW = 0; int pixelAverW = 0;
+                    int pixelNW = 0; int pixelAverNW = 0;
+                    int pixelN = 0; int pixelAverN = 0;
+                    int pixelNE = 0; int pixelAverNE = 0;
+                    int pixelE = 0; int pixelAverE = 0;
+                    int pixelSE = 0; int pixelAverSE = 0;
+                    int pixelS = 0; int pixelAverS = 0;
+                    int pixelSW = 0; int pixelAverSW = 0;
+                    int pixelC = 0; int pixelAverC = 0;
+
+                    int kernelSize = sizeof(nagaoC) / sizeof(*nagaoC);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoW[x][y], 2);
+                            pixelAverW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoW[x][y];
+
+                            pixelNW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNW[x][y], 2);
+                            pixelAverNW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNW[x][y];
+
+                            pixelN += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoN[x][y], 2);
+                            pixelAverN += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoN[x][y];
+
+                            pixelNE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNE[x][y], 2);
+                            pixelAverNE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNE[x][y];
+
+                            pixelE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoE[x][y], 2);
+                            pixelAverE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoE[x][y];
+
+                            pixelSE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoSE[x][y], 2);
+                            pixelAverSE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoSE[x][y];
+
+                            pixelS += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoS[x][y], 2);
+                            pixelAverS += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoS[x][y];
+
+                            pixelSW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoSW[x][y], 2);
+                            pixelAverSW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSW[x][y];
+
+                            pixelC += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoC[x][y], 2);
+                            pixelAverC += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoC[x][y];
+                        }
+                    }
+                    double varPixelW = (double(pixelW)/9.0) - pow(double(pixelAverW)/9.0, 2);
+                    double varPixelNW = (double(pixelNW)/9.0) - pow(double(pixelAverNW)/9.0, 2);
+                    double varPixelN = (double(pixelN)/9.0)- pow(double(pixelAverN)/9.0, 2);
+                    double varPixelNE = (double(pixelNE)/9.0) - pow(double(pixelAverNE)/9.0, 2);
+                    double varPixelE = (double(pixelE)/9.0) - pow(double(pixelAverE)/9.0, 2);
+                    double varPixelSE = (double(pixelSE)/9.0) - pow(double(pixelAverSE)/9.0, 2);
+                    double varPixelS = (double(pixelS)/9.0) - pow(double(pixelAverS)/9.0, 2);
+                    double varPixelSW = (double(pixelSW)/9.0) - pow(double(pixelAverSW)/9.0, 2);
+                    double varPixelC = (double(pixelC)/9.0) - pow(double(pixelAverC)/9.0, 2);
+
+                    double array[9] = {varPixelW, varPixelNW, varPixelN, varPixelNE, varPixelE, varPixelSE, varPixelS, varPixelSW, varPixelC};
+                    double minVar = varPixelW;
+                    for(int i = 1; i < 9; i++){
+                        if(array[i] < minVar){
+                            minVar = array[i];
+                        }
+                    }
+                    int pixel = 255;
+                    if(minVar == varPixelW){
+                        pixel = pixelAverW / 9;
+                    }else if(minVar == varPixelNW){
+                        pixel = pixelAverNW / 9;
+                    }else if(minVar == varPixelN){
+                        pixel = pixelAverN / 9;
+                    }else if (minVar == varPixelNE){
+                        pixel = pixelAverNE / 9;
+                    }else if (minVar == varPixelE){
+                        pixel = pixelAverE / 9;
+                    }else if (minVar == varPixelSE){
+                        pixel = pixelAverSE / 9;
+                    }else if (minVar == varPixelS){
+                        pixel = pixelAverS / 9;
+                    }else if (minVar == varPixelSW){
+                        pixel = pixelAverSW / 9;
+                    }else if (minVar == varPixelC){
+                        pixel = pixelAverC / 9;
+                    }
+                    imageConvolution.setPixel(i, j, qRgb(QColor(imageConvolution.pixel(i, j)).red(), QColor(imageConvolution.pixel(i, j)).green(), pixel));
+                }
+            }
+        }else if (channel == ALL){ // Nagao filter for the GREEN channel
+            for(int i = middleNagao; i < w - middleNagao; i++){
+                for(int j = middleNagao; j < h - middleNagao; j++){
+
+                    int pixelW = 0; int pixelAverW = 0;
+                    int pixelNW = 0; int pixelAverNW = 0;
+                    int pixelN = 0; int pixelAverN = 0;
+                    int pixelNE = 0; int pixelAverNE = 0;
+                    int pixelE = 0; int pixelAverE = 0;
+                    int pixelSE = 0; int pixelAverSE = 0;
+                    int pixelS = 0; int pixelAverS = 0;
+                    int pixelSW = 0; int pixelAverSW = 0;
+                    int pixelC = 0; int pixelAverC = 0;
+
+                    int kernelSize = sizeof(nagaoC) / sizeof(*nagaoC);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            // RED channel ------------------------------
+                            pixelW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoW[x][y], 2);
+                            pixelAverW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoW[x][y];
+
+                            pixelNW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNW[x][y], 2);
+                            pixelAverNW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNW[x][y];
+
+                            pixelN += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoN[x][y], 2);
+                            pixelAverN += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoN[x][y];
+
+                            pixelNE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNE[x][y], 2);
+                            pixelAverNE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoNE[x][y];
+
+                            pixelE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoE[x][y], 2);
+                            pixelAverE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoE[x][y];
+
+                            pixelSE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSE[x][y], 2);
+                            pixelAverSE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSE[x][y];
+
+                            pixelS += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoS[x][y], 2);
+                            pixelAverS += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoS[x][y];
+
+                            pixelSW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSW[x][y], 2);
+                            pixelAverSW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSW[x][y];
+
+                            pixelC += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoC[x][y], 2);
+                            pixelAverC += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoC[x][y];
+
+
+                            // Pendiente terminar
+
+                        }
+                    }
+                    double varPixelW = (double(pixelW)/9.0) - pow(double(pixelAverW)/9.0, 2);
+                    double varPixelNW = (double(pixelNW)/9.0) - pow(double(pixelAverNW)/9.0, 2);
+                    double varPixelN = (double(pixelN)/9.0)- pow(double(pixelAverN)/9.0, 2);
+                    double varPixelNE = (double(pixelNE)/9.0) - pow(double(pixelAverNE)/9.0, 2);
+                    double varPixelE = (double(pixelE)/9.0) - pow(double(pixelAverE)/9.0, 2);
+                    double varPixelSE = (double(pixelSE)/9.0) - pow(double(pixelAverSE)/9.0, 2);
+                    double varPixelS = (double(pixelS)/9.0) - pow(double(pixelAverS)/9.0, 2);
+                    double varPixelSW = (double(pixelSW)/9.0) - pow(double(pixelAverSW)/9.0, 2);
+                    double varPixelC = (double(pixelC)/9.0) - pow(double(pixelAverC)/9.0, 2);
+
+                    double array[9] = {varPixelW, varPixelNW, varPixelN, varPixelNE, varPixelE, varPixelSE, varPixelS, varPixelSW, varPixelC};
+                    double minVar = varPixelW;
+                    for(int i = 1; i < 9; i++){
+                        if(array[i] < minVar){
+                            minVar = array[i];
+                        }
+                    }
+                    int pixel = 255;
+                    if(minVar == varPixelW){
+                        pixel = pixelAverW / 9;
+                    }else if(minVar == varPixelNW){
+                        pixel = pixelAverNW / 9;
+                    }else if(minVar == varPixelN){
+                        pixel = pixelAverN / 9;
+                    }else if (minVar == varPixelNE){
+                        pixel = pixelAverNE / 9;
+                    }else if (minVar == varPixelE){
+                        pixel = pixelAverE / 9;
+                    }else if (minVar == varPixelSE){
+                        pixel = pixelAverSE / 9;
+                    }else if (minVar == varPixelS){
+                        pixel = pixelAverS / 9;
+                    }else if (minVar == varPixelSW){
+                        pixel = pixelAverSW / 9;
+                    }else if (minVar == varPixelC){
+                        pixel = pixelAverC / 9;
+                    }
+                    imageConvolution.setPixel(i, j, qRgb(pixel, QColor(imageConvolution.pixel(i, j)).green(), QColor(imageConvolution.pixel(i, j)).blue()));
+                }
+            }
+        }else if (channel == GREY){ // Nagao filter for the GREY scale
+            for(int i = middleNagao; i < w - middleNagao; i++){
+                for(int j = middleNagao; j < h - middleNagao; j++){
+
+                    int pixelW = 0; int pixelAverW = 0;
+                    int pixelNW = 0; int pixelAverNW = 0;
+                    int pixelN = 0; int pixelAverN = 0;
+                    int pixelNE = 0; int pixelAverNE = 0;
+                    int pixelE = 0; int pixelAverE = 0;
+                    int pixelSE = 0; int pixelAverSE = 0;
+                    int pixelS = 0; int pixelAverS = 0;
+                    int pixelSW = 0; int pixelAverSW = 0;
+                    int pixelC = 0; int pixelAverC = 0;
+
+                    int kernelSize = sizeof(nagaoC) / sizeof(*nagaoC);
+                    for(int x = 0; x < kernelSize; x++){
+                        for(int y = 0; y < kernelSize; y++){
+                            pixelW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoW[x][y], 2);
+                            pixelAverW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoW[x][y];
+
+                            pixelNW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNW[x][y], 2);
+                            pixelAverNW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNW[x][y];
+
+                            pixelN += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoN[x][y], 2);
+                            pixelAverN += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoN[x][y];
+
+                            pixelNE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNE[x][y], 2);
+                            pixelAverNE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoNE[x][y];
+
+                            pixelE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoE[x][y], 2);
+                            pixelAverE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoE[x][y];
+
+                            pixelSE += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoSE[x][y], 2);
+                            pixelAverSE += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoSE[x][y];
+
+                            pixelS += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoS[x][y], 2);
+                            pixelAverS += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoS[x][y];
+
+                            pixelSW += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoSW[x][y], 2);
+                            pixelAverSW += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).red() * nagaoSW[x][y];
+
+                            pixelC += pow(QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoC[x][y], 2);
+                            pixelAverC += QColor(imageChoosed.pixel(i - middleNagao + x, j - middleNagao + y)).blue() * nagaoC[x][y];
+                        }
+                    }
+                    double varPixelW = (double(pixelW)/9.0) - pow(double(pixelAverW)/9.0, 2);
+                    double varPixelNW = (double(pixelNW)/9.0) - pow(double(pixelAverNW)/9.0, 2);
+                    double varPixelN = (double(pixelN)/9.0)- pow(double(pixelAverN)/9.0, 2);
+                    double varPixelNE = (double(pixelNE)/9.0) - pow(double(pixelAverNE)/9.0, 2);
+                    double varPixelE = (double(pixelE)/9.0) - pow(double(pixelAverE)/9.0, 2);
+                    double varPixelSE = (double(pixelSE)/9.0) - pow(double(pixelAverSE)/9.0, 2);
+                    double varPixelS = (double(pixelS)/9.0) - pow(double(pixelAverS)/9.0, 2);
+                    double varPixelSW = (double(pixelSW)/9.0) - pow(double(pixelAverSW)/9.0, 2);
+                    double varPixelC = (double(pixelC)/9.0) - pow(double(pixelAverC)/9.0, 2);
+
+                    double array[9] = {varPixelW, varPixelNW, varPixelN, varPixelNE, varPixelE, varPixelSE, varPixelS, varPixelSW, varPixelC};
+                    double minVar = varPixelW;
+                    for(int i = 1; i < 9; i++){
+                        if(array[i] < minVar){
+                            minVar = array[i];
+                        }
+                    }
+                    int pixel = 255;
+                    if(minVar == varPixelW){
+                        pixel = pixelAverW / 9;
+                    }else if(minVar == varPixelNW){
+                        pixel = pixelAverNW / 9;
+                    }else if(minVar == varPixelN){
+                        pixel = pixelAverN / 9;
+                    }else if (minVar == varPixelNE){
+                        pixel = pixelAverNE / 9;
+                    }else if (minVar == varPixelE){
+                        pixel = pixelAverE / 9;
+                    }else if (minVar == varPixelSE){
+                        pixel = pixelAverSE / 9;
+                    }else if (minVar == varPixelS){
+                        pixel = pixelAverS / 9;
+                    }else if (minVar == varPixelSW){
+                        pixel = pixelAverSW / 9;
+                    }else if (minVar == varPixelC){
+                        pixel = pixelAverC / 9;
+                    }
+                    imageConvolution.setPixel(i, j, qRgb(pixel, pixel, pixel));
+                }
+            }
+        }
     }
 
 
@@ -852,43 +1366,174 @@ void Conversor::on_buttonApplyContrast_clicked(){
         }
     }
 
+    setupBarChartDemo(ui->plotHistogram);
+
     int wx = ui->labelImageContTrans->width();
     int hx = ui->labelImageContTrans->height();
     ui->labelImageContTrans->setPixmap(QPixmap::fromImage(imageContrast).scaled(wx, hx, Qt::KeepAspectRatio));
     ui->labelImageContTrans->setStyleSheet("border: 0px solid");
 }
 
-void Conversor::on_applyEdges_clicked(){
+void Conversor::on_buttonEdges_clicked()
+{
     imageEdges = imageChoosed;
+    QImage matrizY = imageChoosed;
+    QImage matrizX = imageChoosed;
+    int threshold = ui->spinThreshold->value();
 
     if(ui->comboEdges->currentIndex() == 0){ // sobel
-        int commonFilter[3][3] = {{-1,-2,-3},{0,0,0},{1,2,3}};
-        int commonFilter2[3][3] = {{-1,0,1},{-2,0,2},{-3,0,3}};
+        int kernel1[3][3] = {{1, 2, 1},{0, 0, 0},{-1, -2, -1}};
+        int kernel2[3][3] = {{1, 0,-1},{2, 0,-2},{1, 0,-1}};
         int w = imageChoosed.width();
         int h = imageChoosed.height();
-        int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+        int kernelMiddle = (sizeof(kernel1) / sizeof(*kernel1)) / 2;
 
-        for(int i = middle; i < w - middle; i++){
-            for(int j = middle; j < h - middle; j++){
-                int pixelR = 0;
-                int pixelG = 0;
-                int pixelB = 0;
 
-                int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+        for(int i = kernelMiddle; i < w - kernelMiddle; i++){
+            for(int j = kernelMiddle; j < h - kernelMiddle; j++){
+                double matriz1PixelR = 0;
+                double matriz1PixelG = 0;
+                double matriz1PixelB = 0;
+
+                double matriz2PixelR = 0;
+                double matriz2PixelG = 0;
+                double matriz2PixelB = 0;
+
+                int kernelSize = sizeof(kernel1) / sizeof(*kernel1);
                 for(int x = 0; x < kernelSize; x++){
                     for(int y = 0; y < kernelSize; y++){
-                        pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
-                        pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter[x][y];
-                        pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter[x][y];
+                        matriz1PixelR += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).red() * kernel1[x][y];
+                        matriz1PixelG += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).green() * kernel1[x][y];
+                        matriz1PixelB += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).blue() * kernel1[x][y];
 
-                        pixelR += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).red() * commonFilter2[x][y];
-                        pixelG += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).green() * commonFilter2[x][y];
-                        pixelB += QColor(imageChoosed.pixel(i - middle + x, j - middle + y)).blue() * commonFilter2[x][y];
+                        matriz2PixelR += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).red() * kernel2[x][y];
+                        matriz2PixelG += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).green() * kernel2[x][y];
+                        matriz2PixelB += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).blue() * kernel2[x][y];
                     }
                 }
-                //pixel = pixel / (kernelSize * kernelSize); // Se saca el primedio de todos los pixeles
-                imageConvolution.setPixel(i, j, qRgb(pixel,pixel, pixel);
+
+//                for(int x = -1; x < kernelSize-1; x++){
+//                    for(int y= -1; y < kernelSize-1; y++){
+//                        matriz1PixelR += (QColor(imageChoosed.pixel(i + x, j + y)).red() * kernel1[x+1][y+1]);
+//                        matriz1PixelG += (QColor(imageChoosed.pixel(i + x, j + y)).green() * kernel1[x+1][y+1]);
+//                        matriz1PixelB += (QColor(imageChoosed.pixel(i + x, j + y)).blue() * kernel1[x+1][y+1]);
+
+//                        matriz2PixelR += (QColor(imageChoosed.pixel(i + x, j + y)).red() * kernel2[x+1][y+1]);
+//                        matriz2PixelG += (QColor(imageChoosed.pixel(i + x, j + y)).green() * kernel2[x+1][y+1]);
+//                        matriz2PixelB += (QColor(imageChoosed.pixel(i + x, j + y)).blue() * kernel2[x+1][y+1]);
+//                    }
+//                }
+
+                int matrizPixelR = abs(matriz1PixelR) + abs(matriz2PixelR);
+                int matrizPixelG = abs(matriz1PixelG) + abs(matriz2PixelG);
+                int matrizPixelB = abs(matriz1PixelB) + abs(matriz2PixelB);
+
+//                double matrizPixelR = sqrt(pow(matriz1PixelR, 2) + pow(matriz2PixelR, 2));
+//                double matrizPixelG = sqrt(pow(matriz1PixelR, 2) + pow(matriz2PixelR, 2));
+//                double matrizPixelB = sqrt(pow(matriz1PixelR, 2) + pow(matriz2PixelR, 2));
+
+                if(matrizPixelR > threshold){
+                    matrizPixelR = 0;
+                }else{
+                    matrizPixelR = 255;
+                }
+                if(matrizPixelG > threshold){
+                    matrizPixelG = 0;
+                }else{
+                    matrizPixelG = 255;
+                }
+                if(matrizPixelB > threshold){
+                    matrizPixelB = 0;
+                }else{
+                    matrizPixelB = 255;
+                }
+
+                imageEdges.setPixel(i, j, qRgb(matrizPixelR, matrizPixelG, matrizPixelB));
             }
         }
     }
+    int wx = ui->labelImageEdgTrasf->width();
+    int hx = ui->labelImageEdgTrasf->height();
+    ui->labelImageEdgTrasf->setPixmap(QPixmap::fromImage(imageEdges).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageEdgTrasf->setStyleSheet("border: 0px solid");
+}
+
+
+void Conversor::setupBarChartDemo(QCustomPlot *customPlot)
+{
+    std::cout << "tiki" << std::endl;
+    QString demoName = "Bar Chart Demo";
+    // create empty bar chart objects:
+    QCPBars *regen = new QCPBars(customPlot->xAxis, customPlot->yAxis);
+    QCPBars *nuclear = new QCPBars(customPlot->xAxis, customPlot->yAxis);
+    QCPBars *fossil = new QCPBars(customPlot->xAxis, customPlot->yAxis);
+    customPlot->addPlottable(regen);
+    customPlot->addPlottable(nuclear);
+    customPlot->addPlottable(fossil);
+    // set names and colors:
+    QPen pen;
+    pen.setWidthF(1.2);
+    fossil->setName("Fossil fuels");
+    pen.setColor(QColor(255, 131, 0));
+    fossil->setPen(pen);
+    fossil->setBrush(QColor(255, 131, 0, 50));
+    nuclear->setName("Nuclear");
+    pen.setColor(QColor(1, 92, 191));
+    nuclear->setPen(pen);
+    nuclear->setBrush(QColor(1, 92, 191, 50));
+    regen->setName("Regenerative");
+    pen.setColor(QColor(150, 222, 0));
+    regen->setPen(pen);
+    regen->setBrush(QColor(150, 222, 0, 70));
+    // stack bars ontop of each other:
+    nuclear->moveAbove(fossil);
+    regen->moveAbove(nuclear);
+
+    // prepare x axis with country labels:
+    QVector<double> ticks;
+    QVector<QString> labels;
+    ticks << 1 << 2 << 3 << 4 << 5 << 6 << 7;
+    labels << "USA" << "Japan" << "Germany" << "France" << "UK" << "Italy" << "Canada";
+    customPlot->xAxis->setAutoTicks(false);
+    customPlot->xAxis->setAutoTickLabels(false);
+    customPlot->xAxis->setTickVector(ticks);
+    customPlot->xAxis->setTickVectorLabels(labels);
+    customPlot->xAxis->setTickLabelRotation(60);
+    customPlot->xAxis->setSubTickCount(0);
+    customPlot->xAxis->setTickLength(0, 4);
+    customPlot->xAxis->grid()->setVisible(true);
+    customPlot->xAxis->setRange(0, 8);
+
+    // prepare y axis:
+    customPlot->yAxis->setRange(0, 12.1);
+    customPlot->yAxis->setPadding(5); // a bit more space to the left border
+    customPlot->yAxis->setLabel("Power Consumption in\nKilowatts per Capita (2007)");
+    customPlot->yAxis->grid()->setSubGridVisible(true);
+    QPen gridPen;
+    gridPen.setStyle(Qt::SolidLine);
+    gridPen.setColor(QColor(0, 0, 0, 25));
+    customPlot->yAxis->grid()->setPen(gridPen);
+    gridPen.setStyle(Qt::DotLine);
+    customPlot->yAxis->grid()->setSubGridPen(gridPen);
+
+    // Add data:
+    QVector<double> fossilData, nuclearData, regenData;
+    fossilData  << 0.86*10.5 << 0.83*5.5 << 0.84*5.5 << 0.52*5.8 << 0.89*5.2 << 0.90*4.2 << 0.67*11.2;
+    nuclearData << 0.08*10.5 << 0.12*5.5 << 0.12*5.5 << 0.40*5.8 << 0.09*5.2 << 0.00*4.2 << 0.07*11.2;
+    regenData   << 0.06*10.5 << 0.05*5.5 << 0.04*5.5 << 0.06*5.8 << 0.02*5.2 << 0.07*4.2 << 0.25*11.2;
+    fossil->setData(ticks, fossilData);
+    nuclear->setData(ticks, nuclearData);
+    regen->setData(ticks, regenData);
+
+    // setup legend:
+    customPlot->legend->setVisible(true);
+    customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
+    customPlot->legend->setBrush(QColor(255, 255, 255, 200));
+    QPen legendPen;
+    legendPen.setColor(QColor(130, 130, 130, 200));
+    customPlot->legend->setBorderPen(legendPen);
+    QFont legendFont = font();
+    legendFont.setPointSize(10);
+    customPlot->legend->setFont(legendFont);
+    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 }

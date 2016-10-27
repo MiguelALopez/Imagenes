@@ -8,7 +8,10 @@
 #include <QRgb>
 #include <iostream>
 #include <math.h>
+#include <algorithm>
 //#include <QtCharts>
+//#include <QtCharts/QBarSeries>
+#include "qcustomplot.h"
 
 namespace Ui {
 class Conversor;
@@ -29,7 +32,7 @@ public:
     }TypeTransform;
 
     typedef enum{
-        RED, GREEN, BLUE, ALL
+        RED, GREEN, BLUE, ALL, GREY
     }ChannelFilter;
 
 private slots:
@@ -45,10 +48,14 @@ private slots:
 
     void on_buttonApplyContrast_clicked();
 
-    void on_applyEdges_clicked();
+    void on_buttonEdges_clicked();
+
+    void setupBarChartDemo(QCustomPlot *customPlot);
 
 private:
     Ui::Conversor *ui;
+    void resizeWindow();
+
     QImage imageOriginal;
     QImage imageTrasformada;
     QImage imageChanelR;
