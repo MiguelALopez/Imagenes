@@ -50,7 +50,8 @@ private slots:
 
     void on_buttonEdges_clicked();
 
-    void setupBarChartDemo(QCustomPlot *customPlot);
+    void initVector();
+    void renderHistogram(QCustomPlot *customPlot, QVector<double> pixelData, int maxPixel);
 
 private:
     Ui::Conversor *ui;
@@ -58,16 +59,22 @@ private:
 
     QImage imageOriginal;
     QImage imageTrasformada;
-    QImage imageChanelR;
-    QImage imageChanelG;
-    QImage imageChanelB;
+    QImage imageChannelR;
+    QImage imageChannelG;
+    QImage imageChannelB;
     QImage imageChoosed;
     QImage imageConvolution;
     QImage imageContrast;
     QImage imageEdges;
+
+    QVector<double> imageTransformadaHisto;
+    QVector<double> imageChannelRHisto;
+    QVector<double> imageChannelGHisto;
+    QVector<double> imageChannelBHisto;
 
     TypeTransform transform;
     ChannelFilter channel;
 };
 
 #endif // CONVERSOR_H
+
