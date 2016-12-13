@@ -6,14 +6,20 @@ Conversor::Conversor(QWidget *parent) :
     ui(new Ui::Conversor)
 {
     ui->setupUi(this);
-//    ui->labelImage1->setStyleSheet("border: 0.5px solid grey");
-//    ui->labelImage2->setStyleSheet("border: 0.5px solid grey");
-
 }
 
 Conversor::~Conversor()
 {
     delete ui;
+}
+
+void Conversor::initVector(){
+    for(int i = 0; i < 256; i++){
+        imageTransformadaHisto.append(0);
+        imageChannelRHisto.append(0);
+        imageChannelGHisto.append(0);
+        imageChannelBHisto.append(0);
+    }
 }
 
 void Conversor::resizeWindow(){
@@ -89,26 +95,39 @@ void Conversor::on_buttonLoad_clicked()
         ui->lineURL->setText(filename);
 
         QPixmap image(filename);
+        imageOriginal.load(filename);
         int w = ui->labelImageOriginal->width();
 //        int h = ui->labelImage1->height();
         int h = ui->labelImageOriginal->width();
+
+        if(imageOriginal.width() > ui->spinResize->value() && ui->checkResize->isChecked()){
+            double imageWidth = imageOriginal.width();
+            double imageHeigth = imageOriginal.height();
+            double proportion = imageWidth / ui->spinResize->value();
+            imageOriginal = imageOriginal.scaled(imageWidth / proportion, imageHeigth / proportion);
+            std::cout << imageOriginal.width() << " - " << imageOriginal.height() << std::endl;
+        }
+
+
         ui->labelImageOriginal->setPixmap(image.scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageOriginal->setStyleSheet("border: 0px solid");
 
-        imageOriginal.load(filename);
+//        imageOriginal.load(filename);
+//        imageOriginal = imageOriginal.scaled(750, 600);
 
     }else{
-        QMessageBox::information(this, "Error","Por favor seleccione un tiki");
+        QMessageBox::information(this, "Error","Por favor seleccione una imagen");
     }
 }
 
 // Evento encargado de pasar una imagen a un espacio de color
 void Conversor::on_buttonConvert_clicked(){
     if(!imageOriginal.isNull()){
+        initVector();
         imageTrasformada = imageOriginal;
-        imageChanelR = imageOriginal;
-        imageChanelG = imageOriginal;
-        imageChanelB = imageOriginal;
+        imageChannelR = imageOriginal;
+        imageChannelG = imageOriginal;
+        imageChannelB = imageOriginal;
 
 
         for(int i = 0; i < imageOriginal.width(); i++){
@@ -118,91 +137,119 @@ void Conversor::on_buttonConvert_clicked(){
                     int R = QColor(imageOriginal.pixel(i, j)).red();
                     int G = QColor(imageOriginal.pixel(i, j)).green();
                     int B = QColor(imageOriginal.pixel(i, j)).blue();
-
+                    imageTransformadaHisto[R]++;
+                    imageChannelRHisto[R]++;
+                    imageChannelGHisto[G]++;
+                    imageChannelBHisto[B]++;
 
                     imageTrasformada.setPixel(i, j, qRgb(R, G, B));
-                    imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, G, 0));
-                    imageChanelB.setPixel(i, j, qRgb(0, 0, B));
+                    imageChannelR.setPixel(i, j, qRgb(R, 0, 0));
+                    imageChannelG.setPixel(i, j, qRgb(0, G, 0));
+                    imageChannelB.setPixel(i, j, qRgb(0, 0, B));
                     transform = RGB;
 
                 }else if(ui->comboFinal->currentIndex() == 1){ // RGB to Grayscale
                     int color = QColor(imageOriginal.pixel(i, j)).red() * 0.299 + QColor(imageOriginal.pixel(i, j)).green() * 0.587 + QColor(imageOriginal.pixel(i, j)).blue() * 0.114;
                     imageTrasformada.setPixel(i, j, qRgb(color, color, color));
 
-                    imageChanelR.setPixel(i, j, qRgb(color, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, color, 0));
-                    imageChanelB.setPixel(i, j, qRgb(0, 0, color));
+                    imageTransformadaHisto[color]++;
+                    imageChannelRHisto[color]++;
+                    imageChannelGHisto[color]++;
+                    imageChannelBHisto[color]++;
+
+                    imageChannelR.setPixel(i, j, qRgb(color, 0, 0));
+                    imageChannelG.setPixel(i, j, qRgb(0, color, 0));
+                    imageChannelB.setPixel(i, j, qRgb(0, 0, color));
                     transform = GRAYSCALE;
 
                 }else if(ui->comboFinal->currentIndex() == 2){// RGB yo HSV
                     int H = QColor(imageOriginal.pixel(i, j)).hue();
                     int S = QColor(imageOriginal.pixel(i, j)).saturation();
                     int V = QColor(imageOriginal.pixel(i, j)).value();
+
+//                    imageTransformadaHisto[H]++;
+                    imageChannelRHisto[H]++;
+                    imageChannelGHisto[S]++;
+                    imageChannelBHisto[V]++;
+
                     imageTrasformada.setPixel(i, j, qRgb(H, S, V));
-                    imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, S, 0));
-                    imageChanelB.setPixel(i, j, qRgb(0, 0, V));
+                    imageChannelR.setPixel(i, j, qRgb(H, 0, 0));
+                    imageChannelG.setPixel(i, j, qRgb(0, S, 0));
+                    imageChannelB.setPixel(i, j, qRgb(0, 0, V));
                     transform = HSV;
-    //                std::cout << "R: " << imageOriginal.pixelColor(i, j).red() << " G: " << imageOriginal.pixelColor(i, j).green() << " B: " << imageOriginal.pixelColor(i, j).blue() << std::endl;
-    //                std::cout << "hue: " << H << " saturation: " << S <<  " Value: " << V << std::endl;
 
                 }else if(ui->comboFinal->currentIndex() == 3){ // RGB to HSL
                     int H = QColor(imageOriginal.pixel(i, j)).hue();
                     int S = QColor(imageOriginal.pixel(i, j)).saturation();
                     int L = QColor(imageOriginal.pixel(i, j)).lightness();
+
+                    imageChannelRHisto[H]++;
+                    imageChannelGHisto[S]++;
+                    imageChannelBHisto[L]++;
+
                     imageTrasformada.setPixel(i, j, qRgb(H, S, L));
-                    imageChanelR.setPixel(i, j, qRgb(H, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, S, 0));
-                    imageChanelB.setPixel(i, j, qRgb(0, 0, L));
+                    imageChannelR.setPixel(i, j, qRgb(H, 0, 0));
+                    imageChannelG.setPixel(i, j, qRgb(0, S, 0));
+                    imageChannelB.setPixel(i, j, qRgb(0, 0, L));
                     transform = HSL;
 
                 }else if(ui->comboFinal->currentIndex() == 4){ // RGB to Opponent Color
-    //                int O1 = imageOriginal.pixelColor(i, j).red() * 0.06 + imageOriginal.pixelColor(i, j).green() * 0.63 + imageOriginal.pixelColor(i, j).blue() * 0.27;
-    //                int O2 = imageOriginal.pixelColor(i, j).red() * 0.3 + imageOriginal.pixelColor(i, j).green() * 0.04 + imageOriginal.pixelColor(i, j).blue() * -0.35;
-    //                int O3 = imageOriginal.pixelColor(i, j).red() * 0.34 + imageOriginal.pixelColor(i, j).green() * -0.6 + imageOriginal.pixelColor(i, j).blue() * 0.17;
                     int R = QColor(imageOriginal.pixel(i, j)).red();
                     int G = QColor(imageOriginal.pixel(i, j)).green();
                     int B = QColor(imageOriginal.pixel(i, j)).blue();
                     double O1 = (R - G) / sqrt(2);
                     double O2 = (R + G - 2*B) / sqrt(6);
                     double O3 = (R + G + B) / sqrt(3);
+
+                    imageChannelRHisto[O1]++;
+                    imageChannelGHisto[O2]++;
+                    imageChannelBHisto[O3]++;
+
                     imageTrasformada.setPixel(i, j, qRgb(O1, O2, O3));
-                    imageChanelR.setPixel(i, j, qRgb(O1, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, O2, 0));
-                    imageChanelB.setPixel(i, j, qRgb(0, 0, O2));
+                    imageChannelR.setPixel(i, j, qRgb(O1, 0, 0));
+                    imageChannelG.setPixel(i, j, qRgb(0, O2, 0));
+                    imageChannelB.setPixel(i, j, qRgb(0, 0, O2));
                     transform = OPPONENT;
 
                 }else if(ui->comboFinal->currentIndex() == 5){ // RGB to CMY
                     int C = QColor(imageOriginal.pixel(i, j)).cyan();
                     int M = QColor(imageOriginal.pixel(i, j)).magenta();
                     int Y = QColor(imageOriginal.pixel(i, j)).yellow();
+
+                    imageChannelRHisto[C]++;
+                    imageChannelGHisto[M]++;
+                    imageChannelBHisto[Y]++;
+
                     imageTrasformada.setPixel(i, j, qRgb(C, M, Y));
-                    imageChanelR.setPixel(i, j, qRgb(C, 255, 255));
-                    imageChanelG.setPixel(i, j, qRgb(255, M, 255));
-                    imageChanelB.setPixel(i, j, qRgb(255, 255, Y));
+                    imageChannelR.setPixel(i, j, qRgb(C, 255, 255));
+                    imageChannelG.setPixel(i, j, qRgb(255, M, 255));
+                    imageChannelB.setPixel(i, j, qRgb(255, 255, Y));
                     transform = CMY;
 
                 }else if(ui->comboFinal->currentIndex() == 6){ // RGB to R
-                    imageTrasformada.setPixel(i, j, qRgb(QColor(imageOriginal.pixel(i, j)).red(), 0, 0));
-
+                    imageTrasformada.setPixel(i, j, qRgb(QColor(imageOriginal.pixel(i, j)).red(), 0, 0));                    
+                    imageChannelRHisto[QColor(imageOriginal.pixel(i, j)).red()]++;
                 }else if(ui->comboFinal->currentIndex() == 7){ // RGB to G
                     imageTrasformada.setPixel(i, j, qRgb(0, QColor(imageOriginal.pixel(i, j)).green(), 0));
-
+                    imageChannelGHisto[QColor(imageOriginal.pixel(i, j)).green()]++;
                 }else if(ui->comboFinal->currentIndex() == 8){ // RGB to B
                     imageTrasformada.setPixel(i, j, qRgb(0, 0, QColor(imageOriginal.pixel(i, j)).blue()));
+                    imageChannelBHisto[QColor(imageOriginal.pixel(i, j)).blue()]++;
 
                 }else if(ui->comboFinal->currentIndex() == 9){ // RGB to RGB invertidos
                     int R = 255 - QColor(imageOriginal.pixel(i, j)).red();
                     int G = 255 - QColor(imageOriginal.pixel(i, j)).green();
                     int B = 255 - QColor(imageOriginal.pixel(i, j)).blue();
 
-                    imageTrasformada.setPixel(i, j, qRgb(R, G, B));
-                    imageChanelR.setPixel(i, j, qRgb(R, 0, 0));
-                    imageChanelG.setPixel(i, j, qRgb(0, G, 0));
-                    imageChanelB.setPixel(i, j, qRgb(B, 0, B));
-                    transform = INVERTIDOS;
+                    imageChannelRHisto[R]++;
+                    imageChannelGHisto[G]++;
+                    imageChannelBHisto[B]++;
 
+                    imageTrasformada.setPixel(i, j, qRgb(R, G, B));
+                    imageChannelR.setPixel(i, j, qRgb(R, 0, 0));
+                    imageChannelG.setPixel(i, j, qRgb(0, G, 0));
+                    imageChannelB.setPixel(i, j, qRgb(B, 0, B));
+                    transform = INVERTIDOS;
                 }
             }
         }
@@ -214,17 +261,17 @@ void Conversor::on_buttonConvert_clicked(){
 
         w = ui->labelChannelR->width();
         h = ui->labelChannelR->height();
-        ui->labelChannelR->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelChannelR->setPixmap(QPixmap::fromImage(imageChannelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelChannelR->setStyleSheet("border: 0px solid");
 
         w = ui->labelChannelG->width();
         h = ui->labelChannelG->height();
-        ui->labelChannelG->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelChannelG->setPixmap(QPixmap::fromImage(imageChannelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelChannelG->setStyleSheet("border: 0px solid");
 
         w = ui->labelChannelB->width();
         h = ui->labelChannelB->height();
-        ui->labelChannelB->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelChannelB->setPixmap(QPixmap::fromImage(imageChannelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelChannelB->setStyleSheet("border: 0px solid");
     }else{
         QMessageBox::information(this, "Error","Por favor seleccione un tiki");
@@ -238,42 +285,49 @@ void Conversor::on_buttonSelectChannel_clicked()
     int w = ui->labelImageConvOrig->width();
     int h = ui->labelImageConvOrig->height();
     if (ui->comboChannel->currentIndex() == 0){ // Channel 1
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChannelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
 
-        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChannelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
 
-        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChanelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChannelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-        imageChoosed = imageChanelR;
+//        int max = *std::min_element(imageChannelRHisto.begin(), imageChannelRHisto.end());
+
+        renderHistogram(ui->plotHistogram, imageChannelRHisto, 10);
+        imageChoosed = imageChannelR;
         channel = RED;
 
     }else if (ui->comboChannel->currentIndex() == 1){ // Channel 2
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChannelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
 
-        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChannelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
 
-        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChanelG).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChannelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-        imageChoosed = imageChanelG;
+//        int max = *std::min_element(imageChannelBHisto.begin(), imageChannelBHisto.end());
+        renderHistogram(ui->plotHistogram, imageChannelBHisto, 10);
+        imageChoosed = imageChannelG;
         channel = GREEN;
 
     }else if(ui->comboChannel->currentIndex() == 2){ // Chanel 3
-        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChannelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
 
-        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChannelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
 
-        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChanelB).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChannelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-        imageChoosed = imageChanelB;
+//        int max = *std::min_element(imageChannelGHisto.begin(), imageChannelGHisto.end());
+        renderHistogram(ui->plotHistogram, imageChannelGHisto, 10);
+        imageChoosed = imageChannelB;
         channel = BLUE;
 
     }else if(ui->comboChannel->currentIndex() == 3){ // All the channels
@@ -286,6 +340,8 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
+//        int max = *std::min_element(imageChannelRHisto.begin(), imageChannelRHisto.end());
+        renderHistogram(ui->plotHistogram, imageChannelRHisto, 10);
         imageChoosed = imageTrasformada;
         channel = ALL;
     }else if(ui->comboChannel->currentIndex() == 4){ // Grey scale
@@ -298,6 +354,8 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
+//        int max = *std::min_element(imageTransformadaHisto.begin(), imageTransformadaHisto.end());
+        renderHistogram(ui->plotHistogram, imageTransformadaHisto, 10);
         imageChoosed = imageTrasformada;
         channel = GREY;
     }
@@ -1366,7 +1424,7 @@ void Conversor::on_buttonApplyContrast_clicked(){
         }
     }
 
-    setupBarChartDemo(ui->plotHistogram);
+//    setupBarChartDemo(ui->plotHistogram);
 
     int wx = ui->labelImageContTrans->width();
     int hx = ui->labelImageContTrans->height();
@@ -1377,16 +1435,15 @@ void Conversor::on_buttonApplyContrast_clicked(){
 void Conversor::on_buttonEdges_clicked()
 {
     imageEdges = imageChoosed;
-    QImage matrizY = imageChoosed;
-    QImage matrizX = imageChoosed;
     int threshold = ui->spinThreshold->value();
 
     if(ui->comboEdges->currentIndex() == 0){ // sobel
         int kernel1[3][3] = {{1, 2, 1},{0, 0, 0},{-1, -2, -1}};
-        int kernel2[3][3] = {{1, 0,-1},{2, 0,-2},{1, 0,-1}};
+        int kernel2[3][3] = {{1, 0, -1},{2, 0, -2},{1, 0, -1}};
         int w = imageChoosed.width();
         int h = imageChoosed.height();
         int kernelMiddle = (sizeof(kernel1) / sizeof(*kernel1)) / 2;
+        int kernelSize = sizeof(kernel1) / sizeof(*kernel1);
 
 
         for(int i = kernelMiddle; i < w - kernelMiddle; i++){
@@ -1399,7 +1456,6 @@ void Conversor::on_buttonEdges_clicked()
                 double matriz2PixelG = 0;
                 double matriz2PixelB = 0;
 
-                int kernelSize = sizeof(kernel1) / sizeof(*kernel1);
                 for(int x = 0; x < kernelSize; x++){
                     for(int y = 0; y < kernelSize; y++){
                         matriz1PixelR += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).red() * kernel1[x][y];
@@ -1412,25 +1468,9 @@ void Conversor::on_buttonEdges_clicked()
                     }
                 }
 
-//                for(int x = -1; x < kernelSize-1; x++){
-//                    for(int y= -1; y < kernelSize-1; y++){
-//                        matriz1PixelR += (QColor(imageChoosed.pixel(i + x, j + y)).red() * kernel1[x+1][y+1]);
-//                        matriz1PixelG += (QColor(imageChoosed.pixel(i + x, j + y)).green() * kernel1[x+1][y+1]);
-//                        matriz1PixelB += (QColor(imageChoosed.pixel(i + x, j + y)).blue() * kernel1[x+1][y+1]);
-
-//                        matriz2PixelR += (QColor(imageChoosed.pixel(i + x, j + y)).red() * kernel2[x+1][y+1]);
-//                        matriz2PixelG += (QColor(imageChoosed.pixel(i + x, j + y)).green() * kernel2[x+1][y+1]);
-//                        matriz2PixelB += (QColor(imageChoosed.pixel(i + x, j + y)).blue() * kernel2[x+1][y+1]);
-//                    }
-//                }
-
                 int matrizPixelR = abs(matriz1PixelR) + abs(matriz2PixelR);
                 int matrizPixelG = abs(matriz1PixelG) + abs(matriz2PixelG);
                 int matrizPixelB = abs(matriz1PixelB) + abs(matriz2PixelB);
-
-//                double matrizPixelR = sqrt(pow(matriz1PixelR, 2) + pow(matriz2PixelR, 2));
-//                double matrizPixelG = sqrt(pow(matriz1PixelR, 2) + pow(matriz2PixelR, 2));
-//                double matrizPixelB = sqrt(pow(matriz1PixelR, 2) + pow(matriz2PixelR, 2));
 
                 if(matrizPixelR > threshold){
                     matrizPixelR = 0;
@@ -1448,7 +1488,7 @@ void Conversor::on_buttonEdges_clicked()
                     matrizPixelB = 255;
                 }
 
-                imageEdges.setPixel(i, j, qRgb(matrizPixelR, matrizPixelG, matrizPixelB));
+                imageEdges.setPixel(i, j, qRgb(matrizPixelG, matrizPixelG, matrizPixelG));
             }
         }
     }
@@ -1459,81 +1499,72 @@ void Conversor::on_buttonEdges_clicked()
 }
 
 
-void Conversor::setupBarChartDemo(QCustomPlot *customPlot)
+void Conversor::renderHistogram(QCustomPlot *customPlot, QVector<double> pixelData, int maxPixel)
 {
-    std::cout << "tiki" << std::endl;
     QString demoName = "Bar Chart Demo";
+    // set dark background gradient:
+    QLinearGradient gradient(0, 0, 0, 400);
+    gradient.setColorAt(0, QColor(90, 90, 90));
+    gradient.setColorAt(0.38, QColor(105, 105, 105));
+    gradient.setColorAt(1, QColor(70, 70, 70));
+    customPlot->setBackground(QBrush(gradient));
+
     // create empty bar chart objects:
-    QCPBars *regen = new QCPBars(customPlot->xAxis, customPlot->yAxis);
-    QCPBars *nuclear = new QCPBars(customPlot->xAxis, customPlot->yAxis);
-    QCPBars *fossil = new QCPBars(customPlot->xAxis, customPlot->yAxis);
-    customPlot->addPlottable(regen);
-    customPlot->addPlottable(nuclear);
-    customPlot->addPlottable(fossil);
-    // set names and colors:
-    QPen pen;
-    pen.setWidthF(1.2);
-    fossil->setName("Fossil fuels");
-    pen.setColor(QColor(255, 131, 0));
-    fossil->setPen(pen);
-    fossil->setBrush(QColor(255, 131, 0, 50));
-    nuclear->setName("Nuclear");
-    pen.setColor(QColor(1, 92, 191));
-    nuclear->setPen(pen);
-    nuclear->setBrush(QColor(1, 92, 191, 50));
-    regen->setName("Regenerative");
-    pen.setColor(QColor(150, 222, 0));
-    regen->setPen(pen);
-    regen->setBrush(QColor(150, 222, 0, 70));
-    // stack bars ontop of each other:
-    nuclear->moveAbove(fossil);
-    regen->moveAbove(nuclear);
+    QCPBars *numPixels = new QCPBars(customPlot->xAxis, customPlot->yAxis);
+    numPixels->setAntialiased(false); // gives more crisp, pixel aligned bar borders
+    numPixels->setStackingGap(10);
+
+    numPixels->setName("pixels");
+    numPixels->setPen(QPen(QColor(0, 168, 140).lighter(130)));
+    numPixels->setBrush(QColor(0, 168, 140));
+
 
     // prepare x axis with country labels:
     QVector<double> ticks;
     QVector<QString> labels;
-    ticks << 1 << 2 << 3 << 4 << 5 << 6 << 7;
-    labels << "USA" << "Japan" << "Germany" << "France" << "UK" << "Italy" << "Canada";
-    customPlot->xAxis->setAutoTicks(false);
-    customPlot->xAxis->setAutoTickLabels(false);
-    customPlot->xAxis->setTickVector(ticks);
-    customPlot->xAxis->setTickVectorLabels(labels);
-    customPlot->xAxis->setTickLabelRotation(60);
-    customPlot->xAxis->setSubTickCount(0);
-    customPlot->xAxis->setTickLength(0, 4);
-    customPlot->xAxis->grid()->setVisible(true);
-    customPlot->xAxis->setRange(0, 8);
+//    ticks << 1 << 2 << 3 << 4 << 5 << 6 << 7;
+    for(int i = 0; i < 256; i++){
+        ticks.append(i);
+        labels.append(QString::number(i));
+    }
+
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    textTicker->addTicks(ticks, labels);
+    customPlot->xAxis->setTicker(textTicker);
+    customPlot->xAxis->setTickLabelRotation(90);
+    customPlot->xAxis->setSubTicks(false);
+  //  customPlot->xAxis->setTickLength(0, 4);
+    customPlot->xAxis->setRange(0, 255);
+    customPlot->xAxis->setBasePen(QPen(Qt::white));
+    customPlot->xAxis->setTickPen(QPen(Qt::white));
+    customPlot->xAxis->grid()->setVisible(false);
+  //  customPlot->xAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
+    customPlot->xAxis->setTickLabelColor(Qt::white);
+    customPlot->xAxis->setLabelColor(Qt::white);
 
     // prepare y axis:
-    customPlot->yAxis->setRange(0, 12.1);
-    customPlot->yAxis->setPadding(5); // a bit more space to the left border
-    customPlot->yAxis->setLabel("Power Consumption in\nKilowatts per Capita (2007)");
+    customPlot->yAxis->setRange(0, maxPixel);
+    customPlot->yAxis->setPadding(1.5); // a bit more space to the left border
+    customPlot->yAxis->setBasePen(QPen(Qt::white));
+    customPlot->yAxis->setTickPen(QPen(Qt::white));
+    customPlot->yAxis->setSubTickPen(QPen(Qt::white));
     customPlot->yAxis->grid()->setSubGridVisible(true);
-    QPen gridPen;
-    gridPen.setStyle(Qt::SolidLine);
-    gridPen.setColor(QColor(0, 0, 0, 25));
-    customPlot->yAxis->grid()->setPen(gridPen);
-    gridPen.setStyle(Qt::DotLine);
-    customPlot->yAxis->grid()->setSubGridPen(gridPen);
+    customPlot->yAxis->setTickLabelColor(Qt::white);
+    customPlot->yAxis->setLabelColor(Qt::white);
+    customPlot->yAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::SolidLine));
+    customPlot->yAxis->grid()->setSubGridPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
 
     // Add data:
-    QVector<double> fossilData, nuclearData, regenData;
-    fossilData  << 0.86*10.5 << 0.83*5.5 << 0.84*5.5 << 0.52*5.8 << 0.89*5.2 << 0.90*4.2 << 0.67*11.2;
-    nuclearData << 0.08*10.5 << 0.12*5.5 << 0.12*5.5 << 0.40*5.8 << 0.09*5.2 << 0.00*4.2 << 0.07*11.2;
-    regenData   << 0.06*10.5 << 0.05*5.5 << 0.04*5.5 << 0.06*5.8 << 0.02*5.2 << 0.07*4.2 << 0.25*11.2;
-    fossil->setData(ticks, fossilData);
-    nuclear->setData(ticks, nuclearData);
-    regen->setData(ticks, regenData);
+    numPixels->setData(ticks, pixelData);
 
     // setup legend:
-    customPlot->legend->setVisible(true);
+    customPlot->legend->setVisible(false);
     customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
-    customPlot->legend->setBrush(QColor(255, 255, 255, 200));
-    QPen legendPen;
-    legendPen.setColor(QColor(130, 130, 130, 200));
-    customPlot->legend->setBorderPen(legendPen);
+//    customPlot->legend->setBrush(QColor(255, 255, 255, 100));
+//    customPlot->legend->setBorderPen(Qt::NoPen);
     QFont legendFont = font();
     legendFont.setPointSize(10);
     customPlot->legend->setFont(legendFont);
     customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 }
+
