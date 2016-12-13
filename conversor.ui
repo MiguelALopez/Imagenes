@@ -150,11 +150,6 @@
              </item>
              <item>
               <property name="text">
-               <string>All Channels</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
                <string>Grey scale</string>
               </property>
              </item>
@@ -163,13 +158,8 @@
            <item row="1" column="0">
             <widget class="QComboBox" name="comboFinal">
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
-             <item>
-              <property name="text">
-               <string>RGB</string>
-              </property>
-             </item>
              <item>
               <property name="text">
                <string>Grayscale</string>
@@ -193,21 +183,6 @@
              <item>
               <property name="text">
                <string>CMY</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>R</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>G</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>B</string>
               </property>
              </item>
              <item>

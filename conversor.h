@@ -32,7 +32,7 @@ public:
     }TypeTransform;
 
     typedef enum{
-        RED, GREEN, BLUE, ALL, GREY
+        RED, GREEN, BLUE, GREY
     }ChannelFilter;
 
 private slots:
@@ -63,6 +63,7 @@ private:
     QImage imageChannelG;
     QImage imageChannelB;
     QImage imageChoosed;
+    
     QImage imageConvolution;
     QImage imageContrast;
     QImage imageEdges;

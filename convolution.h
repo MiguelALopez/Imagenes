@@ -9,13 +9,13 @@ class Convolution
 public:
     Convolution();
 
-    void averageFilter(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
-    void minimumFilter(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
-    void maximumFilter(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
-    void middleFilter(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
-    void gaussianFilterx3(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
-    void gaussianFilterx5(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
-    void nagaoFilter(QImage *imageOriginal , QImage *imageResult, Conversor::ChannelFilter channel);
+    void averageFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void minimumFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void maximumFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void middleFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void gaussianFilterx3(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void gaussianFilterx5(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void nagaoFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
 private:
 
 };
