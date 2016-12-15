@@ -447,3 +447,9 @@ void Conversor::on_bApplyMorph_clicked()
      ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(wx, hx, Qt::KeepAspectRatio));
      ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
 }
+
+void Conversor::on_buttonSave_clicked()
+{
+    QString file = QFileDialog::getSaveFileName(this, tr("Save File"), "", "Image (*.png)");
+    imageChoosed.save(file, "png");
+}

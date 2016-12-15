@@ -1,4 +1,5 @@
 #include "edges.h"
+#include "threshold.h"
 
 Edges::Edges()
 {
@@ -31,15 +32,20 @@ void Edges::sobelOperator(QImage *image, int threshold, Conversor::ChannelFilter
 
                 int matrizPixel = abs(matriz1Pixel) + abs(matriz2Pixel);
 
-                if(matrizPixel < threshold){
-                    matrizPixel = 0;
-                }else{
-                    matrizPixel = 255;
-                }
+
+
+//                if(matrizPixel < threshold){
+//                    matrizPixel = 0;
+//                }else{
+//                    matrizPixel = 255;
+//                }
 
                 resultImage.setPixel(i, j, qRgb(matrizPixel, matrizPixel, matrizPixel));
             }
         }
+
+        Threshold().otsuThreshold(&resultImage, channel);
+//        Threshold().manualThreshold(&resultImage, 0,0);
 
 
     *image = resultImage;

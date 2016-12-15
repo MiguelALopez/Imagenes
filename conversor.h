@@ -72,6 +72,8 @@ private slots:
 
     void on_bApplyMorph_clicked();
 
+    void on_buttonSave_clicked();
+
 private:
     Ui::Conversor *ui;
     void resizeWindow();

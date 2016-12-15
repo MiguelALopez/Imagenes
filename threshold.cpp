@@ -113,9 +113,9 @@ int Threshold::triangleThreshold(QImage *image, int tiki){
     // Se llena el histograma con los valores correspondientes
     for(int i = 0; i < w ; i++){
         for(int j = 0; j < h; j++){
-            if (QColor(image->pixel(i, j)).red()  > tiki){
+//            if (QColor(image->pixel(i, j)).red()  > tiki){
                 histogram[QColor(image->pixel(i, j)).red()]++;
-            }
+//            }
         }
     }
 
