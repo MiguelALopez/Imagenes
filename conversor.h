@@ -53,6 +53,26 @@ private slots:
     void initVector();
     void renderHistogram(QCustomPlot *customPlot, QVector<double> pixelData, int maxPixel);
 
+    void on_bUseConv_clicked();
+
+    void on_bSaveconv_clicked();
+
+    void on_bUseContrast_clicked();
+
+    void on_bSaveContrast_clicked();
+
+    void on_bUseEdges_clicked();
+
+    void on_bSaveEdges_clicked();
+
+    void on_bApplyThres_clicked();
+
+    void on_bUseThres_clicked();
+
+    void on_bSaveThres_clicked();
+
+    void on_bApplyMorph_clicked();
+
 private:
     Ui::Conversor *ui;
     void resizeWindow();
@@ -67,6 +87,7 @@ private:
     QImage imageConvolution;
     QImage imageContrast;
     QImage imageEdges;
+    QImage imageThres;
 
     QVector<double> imageTransformadaHisto;
     QVector<double> imageChannelRHisto;

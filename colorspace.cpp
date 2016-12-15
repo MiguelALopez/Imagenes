@@ -12,9 +12,9 @@ void ColorSpace::convertToGrayscale(QImage *image, QImage *channelR, QImage *cha
 
             image->setPixel(i, j, qRgb(color, color, color));
 
-            channelR->setPixel(i, j, qRgb(color, 0, 0));
-            channelG->setPixel(i, j, qRgb(0, color, 0));
-            channelB->setPixel(i, j, qRgb(0, 0, color));
+            channelR->setPixel(i, j, qRgb(color, color, color));
+            channelG->setPixel(i, j, qRgb(color, color, color));
+            channelB->setPixel(i, j, qRgb(color, color, color));
         }
     }
 }
@@ -28,9 +28,9 @@ void ColorSpace::convertToHSV(QImage *image, QImage *channelR, QImage *channelG,
 
             image->setPixel(i, j, qRgb(H, S, V));
 
-            channelR->setPixel(i, j, qRgb(H, 0, 0));
-            channelG->setPixel(i, j, qRgb(0, S, 0));
-            channelB->setPixel(i, j, qRgb(0, 0, V));
+            channelR->setPixel(i, j, qRgb(H, H, H));
+            channelG->setPixel(i, j, qRgb(S, S, S));
+            channelB->setPixel(i, j, qRgb(V, V, V));
         }
     }
 }
@@ -44,9 +44,9 @@ void ColorSpace::convertToHSL(QImage *image, QImage *channelR, QImage *channelG,
 
             image->setPixel(i, j, qRgb(H, S, L));
 
-            channelR->setPixel(i, j, qRgb(H, 0, 0));
-            channelG->setPixel(i, j, qRgb(0, S, 0));
-            channelB->setPixel(i, j, qRgb(0, 0, L));
+            channelR->setPixel(i, j, qRgb(H, H, H));
+            channelG->setPixel(i, j, qRgb(S, S, S));
+            channelB->setPixel(i, j, qRgb(L, L, L));
         }
     }
 }
@@ -64,9 +64,9 @@ void ColorSpace::convertToOpponet(QImage *image, QImage *channelR, QImage *chann
 
             image->setPixel(i, j, qRgb(O1, O2, O3));
 
-            channelR->setPixel(i, j, qRgb(O1, 0, 0));
-            channelG->setPixel(i, j, qRgb(0, O2, 0));
-            channelB->setPixel(i, j, qRgb(0, 0, O2));
+            channelR->setPixel(i, j, qRgb(O1, O1, O1));
+            channelG->setPixel(i, j, qRgb(O2, O2, O2));
+            channelB->setPixel(i, j, qRgb(O3, O3, O3));
         }
     }
 }
@@ -80,9 +80,9 @@ void ColorSpace::convertToCMY(QImage *image, QImage *channelR, QImage *channelG,
 
             image->setPixel(i, j, qRgb(C, M, Y));
 
-            channelR->setPixel(i, j, qRgb(C, 255, 255));
-            channelG->setPixel(i, j, qRgb(255, M, 255));
-            channelB->setPixel(i, j, qRgb(255, 255, Y));
+            channelR->setPixel(i, j, qRgb(C, C, C));
+            channelG->setPixel(i, j, qRgb(M, M, M));
+            channelB->setPixel(i, j, qRgb(Y, Y, Y));
         }
     }
 }
@@ -96,9 +96,9 @@ void ColorSpace::convertToInverted(QImage *image, QImage *channelR, QImage *chan
 
             image->setPixel(i, j, qRgb(R, G, B));
 
-            channelR->setPixel(i, j, qRgb(R, 0, 0));
-            channelG->setPixel(i, j, qRgb(0, G, 0));
-            channelB->setPixel(i, j, qRgb(B, 0, B));
+            channelR->setPixel(i, j, qRgb(R, R, R));
+            channelG->setPixel(i, j, qRgb(G, G, G));
+            channelB->setPixel(i, j, qRgb(B, B, B));
         }
     }
 }

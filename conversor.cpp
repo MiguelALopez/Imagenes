@@ -3,6 +3,9 @@
 #include "convolution.h"
 #include "colorspace.h"
 #include "contrast.h"
+#include "edges.h"
+#include "threshold.h"
+#include "morphologicaloperators.h"
 
 Conversor::Conversor(QWidget *parent) :
     QMainWindow(parent),
@@ -41,20 +44,25 @@ void Conversor::resizeWindow(){
     }
 
     if(!imageChoosed.isNull()){
-            int w = ui->labelImageConvOrig->width();
-            int h = ui->labelImageConvOrig->width();
+        int w = ui->labelImageConvOrig->width();
+        int h = ui->labelImageConvOrig->width();
 
-            // Imagen convolucion original
-            ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
+        // Imagen convolucion original
+        ui->labelImageConvOrig->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageConvOrig->setStyleSheet("border: 0px solid");
 
-            // Imagen Contraste original
-            ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
+        // Imagen Contraste original
+        ui->labelImageContOriginal->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContOriginal->setStyleSheet("border: 0px solid");
 
-            // Imagen Bordes original
-            ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
-            ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+        // Imagen Bordes original
+        ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
+
+        // Imagen Threshold original
+        ui->labelImageThresOrigi->setPixmap(QPixmap::fromImage(imageChoosed).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageThresOrigi->setStyleSheet("border: 0px solid");
+
     }
 
     if(!imageConvolution.isNull()){ // Redimenciona el campo de la imagen con el filtro
@@ -65,7 +73,10 @@ void Conversor::resizeWindow(){
     }
 
     if(!imageContrast.isNull()){ // Redimenciona el campo de la imagen con el nuevo contraste
-
+        int w = ui->labelImageContTrans->width();
+        int h = ui->labelImageContTrans->width();
+        ui->labelImageContTrans->setPixmap(QPixmap::fromImage(imageContrast).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageContTrans->setStyleSheet("border: 0px solid");
     }
 
     if(!imageEdges.isNull()){
@@ -73,6 +84,13 @@ void Conversor::resizeWindow(){
         int h = ui->labelImageEdgTrasf->width();
         ui->labelImageEdgTrasf->setPixmap(QPixmap::fromImage(imageEdges).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgTrasf->setStyleSheet("border: 0px solid");
+    }
+
+    if(!imageThres.isNull()){
+        int w = ui->labelImageThresTrans->width();
+        int h = ui->labelImageThresTrans->width();
+        ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
     }
 }
 
@@ -84,7 +102,7 @@ void Conversor::resizeEvent(QResizeEvent * event){
 }
 
 void Conversor::on_tabWidget_currentChanged(int index){
-   resizeWindow();
+    resizeWindow();
 }
 
 // Evento encargado de cargar la imagen desde una ubicacion
@@ -100,7 +118,7 @@ void Conversor::on_buttonLoad_clicked()
         QPixmap image(filename);
         imageOriginal.load(filename);
         int w = ui->labelImageOriginal->width();
-//        int h = ui->labelImage1->height();
+        //        int h = ui->labelImage1->height();
         int h = ui->labelImageOriginal->width();
 
         // Escala la imagen original
@@ -116,8 +134,8 @@ void Conversor::on_buttonLoad_clicked()
         ui->labelImageOriginal->setPixmap(image.scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageOriginal->setStyleSheet("border: 0px solid");
 
-//        imageOriginal.load(filename);
-//        imageOriginal = imageOriginal.scaled(750, 600);
+        //        imageOriginal.load(filename);
+        //        imageOriginal = imageOriginal.scaled(750, 600);
 
     }else{
         QMessageBox::information(this, "Error","Por favor seleccione una imagen");
@@ -178,7 +196,7 @@ void Conversor::on_buttonConvert_clicked(){
 
 }
 
-// Evento encargado de seleccionar un canal para la convolucion
+// Evento encargado de seleccionar un canal
 void Conversor::on_buttonSelectChannel_clicked()
 {
     int w = ui->labelImageConvOrig->width();
@@ -193,7 +211,10 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChannelR).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-//        int max = *std::min_element(imageChannelRHisto.begin(), imageChannelRHisto.end());
+        ui->labelImageThresOrigi->setPixmap(QPixmap::fromImage(imageChannelR).scaled(w, h, Qt::KeepAspectRatio));
+        ui->labelImageThresOrigi->setStyleSheet("border: 0px solid");
+
+        //        int max = *std::min_element(imageChannelRHisto.begin(), imageChannelRHisto.end());
 
         renderHistogram(ui->plotHistogram, imageChannelRHisto, 10);
         imageChoosed = imageChannelR;
@@ -209,7 +230,7 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChannelG).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-//        int max = *std::min_element(imageChannelBHisto.begin(), imageChannelBHisto.end());
+        //        int max = *std::min_element(imageChannelBHisto.begin(), imageChannelBHisto.end());
         renderHistogram(ui->plotHistogram, imageChannelBHisto, 10);
         imageChoosed = imageChannelG;
         channel = GREEN;
@@ -224,7 +245,7 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageChannelB).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-//        int max = *std::min_element(imageChannelGHisto.begin(), imageChannelGHisto.end());
+        //        int max = *std::min_element(imageChannelGHisto.begin(), imageChannelGHisto.end());
         renderHistogram(ui->plotHistogram, imageChannelGHisto, 10);
         imageChoosed = imageChannelB;
         channel = BLUE;
@@ -239,7 +260,7 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setPixmap(QPixmap::fromImage(imageTrasformada).scaled(w, h, Qt::KeepAspectRatio));
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
-//        int max = *std::min_element(imageTransformadaHisto.begin(), imageTransformadaHisto.end());
+        //        int max = *std::min_element(imageTransformadaHisto.begin(), imageTransformadaHisto.end());
         renderHistogram(ui->plotHistogram, imageTransformadaHisto, 10);
         imageChoosed = imageTrasformada;
         channel = GREY;
@@ -247,57 +268,58 @@ void Conversor::on_buttonSelectChannel_clicked()
 }
 // Evento encargado de hacer la convolucion
 void Conversor::on_buttonApplyConvolution_clicked(){
-    // imageConvolution = imageChoosed;
+    imageConvolution = imageChoosed;
     if(ui->comboConvolution->currentIndex() == 0){ // Average filter
-        Convolution().averageFilter(&imageChoosed, channel);
+        Convolution().averageFilter(&imageConvolution, channel);
 
     }else if(ui->comboConvolution->currentIndex() == 1){ // Minimum filter
-        Convolution().minimumFilter(&imageChoosed, channel);
+        Convolution().minimumFilter(&imageConvolution, channel);
 
     }else if(ui->comboConvolution->currentIndex() == 2){ // Maximum filter
-        Convolution().maximumFilter(&imageChoosed, channel);
+        Convolution().maximumFilter(&imageConvolution, channel);
 
     }else if(ui->comboConvolution->currentIndex() == 3){ // Middle filter
-        Convolution().middleFilter(&imageChoosed, channel);
+        Convolution().middleFilter(&imageConvolution, channel);
 
     }else if(ui->comboConvolution->currentIndex() == 4){ // Gaussian filter x3
-        Convolution().gaussianFilterx3(&imageChoosed, channel);
+        Convolution().gaussianFilterx3(&imageConvolution, channel);
 
     }else if(ui->comboConvolution->currentIndex() == 5){ // Gaussian filter x5
-        Convolution().gaussianFilterx5(&imageChoosed, channel);
+        Convolution().gaussianFilterx5(&imageConvolution, channel);
 
     }else if(ui->comboConvolution->currentIndex() == 6){ // Nagao filter
-        Convolution().nagaoFilter(&imageChoosed, channel);
+        Convolution().nagaoFilter(&imageConvolution, channel);
 
     }
 
     int wx = ui->labelImageConvFilt->width();
     int hx = ui->labelImageConvFilt->height();
-    ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageChoosed).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageConvFilt->setPixmap(QPixmap::fromImage(imageConvolution).scaled(wx, hx, Qt::KeepAspectRatio));
     ui->labelImageConvFilt->setStyleSheet("border: 0px solid");
 
 }
 
 
 void Conversor::on_buttonApplyContrast_clicked(){
-    // imageContrast = imageChoosed;
+    imageContrast = imageChoosed;
 
     if(ui->comboContrast->currentIndex() == 0){ // Gamma correction
-        Contrast().gammaCorrection(&imageChoosed, channel, 0.6);
+        double value = ui->spinGamma->value();
+        Contrast().gammaCorrection(&imageContrast, channel, value);
         
     }else if(ui->comboContrast->currentIndex() == 1){ // Histogram equalization
-        Contrast().histogramEqualization(&imageChoosed, channel);
+        Contrast().histogramEqualization(&imageContrast, channel);
 
     }else if(ui->comboContrast->currentIndex() == 2){ // Contrast stretching
-        Contrast().contrastStretching(&imageChoosed, channel);
+        Contrast().contrastStretching(&imageContrast, channel);
 
     }
 
-//    setupBarChartDemo(ui->plotHistogram);
+    //    setupBarChartDemo(ui->plotHistogram);
 
     int wx = ui->labelImageContTrans->width();
     int hx = ui->labelImageContTrans->height();
-    ui->labelImageContTrans->setPixmap(QPixmap::fromImage(imageChoosed).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageContTrans->setPixmap(QPixmap::fromImage(imageContrast).scaled(wx, hx, Qt::KeepAspectRatio));
     ui->labelImageContTrans->setStyleSheet("border: 0px solid");
 }
 
@@ -307,59 +329,7 @@ void Conversor::on_buttonEdges_clicked()
     int threshold = ui->spinThreshold->value();
 
     if(ui->comboEdges->currentIndex() == 0){ // sobel
-        int kernel1[3][3] = {{1, 2, 1},{0, 0, 0},{-1, -2, -1}};
-        int kernel2[3][3] = {{1, 0, -1},{2, 0, -2},{1, 0, -1}};
-        int w = imageChoosed.width();
-        int h = imageChoosed.height();
-        int kernelMiddle = (sizeof(kernel1) / sizeof(*kernel1)) / 2;
-        int kernelSize = sizeof(kernel1) / sizeof(*kernel1);
-
-
-        for(int i = kernelMiddle; i < w - kernelMiddle; i++){
-            for(int j = kernelMiddle; j < h - kernelMiddle; j++){
-                double matriz1PixelR = 0;
-                double matriz1PixelG = 0;
-                double matriz1PixelB = 0;
-
-                double matriz2PixelR = 0;
-                double matriz2PixelG = 0;
-                double matriz2PixelB = 0;
-
-                for(int x = 0; x < kernelSize; x++){
-                    for(int y = 0; y < kernelSize; y++){
-                        matriz1PixelR += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).red() * kernel1[x][y];
-                        matriz1PixelG += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).green() * kernel1[x][y];
-                        matriz1PixelB += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).blue() * kernel1[x][y];
-
-                        matriz2PixelR += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).red() * kernel2[x][y];
-                        matriz2PixelG += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).green() * kernel2[x][y];
-                        matriz2PixelB += QColor(imageChoosed.pixel(i - kernelMiddle + x, j - kernelMiddle + y)).blue() * kernel2[x][y];
-                    }
-                }
-
-                int matrizPixelR = abs(matriz1PixelR) + abs(matriz2PixelR);
-                int matrizPixelG = abs(matriz1PixelG) + abs(matriz2PixelG);
-                int matrizPixelB = abs(matriz1PixelB) + abs(matriz2PixelB);
-
-                if(matrizPixelR > threshold){
-                    matrizPixelR = 0;
-                }else{
-                    matrizPixelR = 255;
-                }
-                if(matrizPixelG > threshold){
-                    matrizPixelG = 0;
-                }else{
-                    matrizPixelG = 255;
-                }
-                if(matrizPixelB > threshold){
-                    matrizPixelB = 0;
-                }else{
-                    matrizPixelB = 255;
-                }
-
-                imageEdges.setPixel(i, j, qRgb(matrizPixelG, matrizPixelG, matrizPixelG));
-            }
-        }
+        Edges().sobelOperator(&imageEdges, threshold, channel);
     }
     int wx = ui->labelImageEdgTrasf->width();
     int hx = ui->labelImageEdgTrasf->height();
@@ -391,7 +361,7 @@ void Conversor::renderHistogram(QCustomPlot *customPlot, QVector<double> pixelDa
     // prepare x axis with country labels:
     QVector<double> ticks;
     QVector<QString> labels;
-//    ticks << 1 << 2 << 3 << 4 << 5 << 6 << 7;
+    //    ticks << 1 << 2 << 3 << 4 << 5 << 6 << 7;
     for(int i = 0; i < 256; i++){
         ticks.append(i);
         labels.append(QString::number(i));
@@ -402,12 +372,12 @@ void Conversor::renderHistogram(QCustomPlot *customPlot, QVector<double> pixelDa
     customPlot->xAxis->setTicker(textTicker);
     customPlot->xAxis->setTickLabelRotation(90);
     customPlot->xAxis->setSubTicks(false);
-  //  customPlot->xAxis->setTickLength(0, 4);
+    //  customPlot->xAxis->setTickLength(0, 4);
     customPlot->xAxis->setRange(0, 255);
     customPlot->xAxis->setBasePen(QPen(Qt::white));
     customPlot->xAxis->setTickPen(QPen(Qt::white));
     customPlot->xAxis->grid()->setVisible(false);
-  //  customPlot->xAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
+    //  customPlot->xAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
     customPlot->xAxis->setTickLabelColor(Qt::white);
     customPlot->xAxis->setLabelColor(Qt::white);
 
@@ -429,11 +399,86 @@ void Conversor::renderHistogram(QCustomPlot *customPlot, QVector<double> pixelDa
     // setup legend:
     customPlot->legend->setVisible(false);
     customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
-//    customPlot->legend->setBrush(QColor(255, 255, 255, 100));
-//    customPlot->legend->setBorderPen(Qt::NoPen);
+    //    customPlot->legend->setBrush(QColor(255, 255, 255, 100));
+    //    customPlot->legend->setBorderPen(Qt::NoPen);
     QFont legendFont = font();
     legendFont.setPointSize(10);
     customPlot->legend->setFont(legendFont);
     customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 }
 
+
+
+
+void Conversor::on_bUseConv_clicked()
+{
+    imageChoosed = imageConvolution;
+    resizeWindow();
+}
+
+void Conversor::on_bSaveconv_clicked()
+{
+
+}
+
+void Conversor::on_bUseContrast_clicked()
+{
+    imageChoosed = imageContrast;
+    resizeWindow();
+}
+
+void Conversor::on_bSaveContrast_clicked()
+{
+
+}
+
+void Conversor::on_bUseEdges_clicked()
+{
+    imageChoosed = imageEdges;
+    resizeWindow();
+}
+
+void Conversor::on_bSaveEdges_clicked()
+{
+
+}
+
+void Conversor::on_bApplyThres_clicked()
+{
+    imageThres = imageChoosed;
+    if(ui->comboThres->currentIndex() == 0){// Otsu Thresholding
+        Threshold().otsuThreshold(&imageThres, channel);
+    }
+
+    int wx = ui->labelImageThresTrans->width();
+    int hx = ui->labelImageThresTrans->height();
+    ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
+
+}
+
+void Conversor::on_bUseThres_clicked()
+{
+    imageChoosed = imageThres;
+    resizeWindow();
+}
+
+void Conversor::on_bSaveThres_clicked()
+{
+
+}
+
+void Conversor::on_bApplyMorph_clicked()
+{
+     imageThres = imageChoosed;
+     if(ui->comboMorph->currentIndex() == 0){ // Dilate Operator
+         MorphologicalOperators().dilate(&imageThres);
+     }else if(ui->comboMorph->currentIndex() == 1){ // Erosion Operator
+        MorphologicalOperators().erosion(&imageThres);
+     }
+
+     int wx = ui->labelImageThresTrans->width();
+     int hx = ui->labelImageThresTrans->height();
+     ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(wx, hx, Qt::KeepAspectRatio));
+     ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
+}
