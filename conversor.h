@@ -11,7 +11,7 @@
 #include <algorithm>
 //#include <QtCharts>
 //#include <QtCharts/QBarSeries>
-#include "qcustomplot.h"
+#include "histogramview.h"
 
 namespace Ui {
 class Conversor;
@@ -51,7 +51,6 @@ private slots:
     void on_buttonEdges_clicked();
 
     void initVector();
-    void renderHistogram(QCustomPlot *customPlot, QVector<double> pixelData, int maxPixel);
 
     void on_bUseConv_clicked();
 
@@ -90,9 +89,7 @@ private:
     QImage imageThres;
 
     QVector<double> imageTransformadaHisto;
-    QVector<double> imageChannelRHisto;
-    QVector<double> imageChannelGHisto;
-    QVector<double> imageChannelBHisto;
+
 
     TypeTransform transform;
     ChannelFilter channel;

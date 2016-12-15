@@ -102,3 +102,19 @@ void ColorSpace::convertToInverted(QImage *image, QImage *channelR, QImage *chan
         }
     }
 }
+
+void ColorSpace::convertToRGB(QImage *image, QImage *channelR, QImage *channelG, QImage *channelB){
+    for(int i = 0; i < image->width(); i++){
+        for(int j = 0; j < image->height(); j++){
+            int R = QColor(image->pixel(i, j)).red();
+            int G = QColor(image->pixel(i, j)).green();
+            int B = QColor(image->pixel(i, j)).blue();
+
+            image->setPixel(i, j, qRgb(R, G, B));
+
+            channelR->setPixel(i, j, qRgb(R, R, R));
+            channelG->setPixel(i, j, qRgb(G, G, G));
+            channelB->setPixel(i, j, qRgb(B, B, B));
+        }
+    }
+}

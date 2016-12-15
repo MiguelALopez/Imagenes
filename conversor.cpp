@@ -22,9 +22,6 @@ Conversor::~Conversor()
 void Conversor::initVector(){
     for(int i = 0; i < 256; i++){
         imageTransformadaHisto.append(0);
-        imageChannelRHisto.append(0);
-        imageChannelGHisto.append(0);
-        imageChannelBHisto.append(0);
     }
 }
 
@@ -168,6 +165,8 @@ void Conversor::on_buttonConvert_clicked(){
         }else if(ui->comboFinal->currentIndex() == 5){ // RGB to Invertidos
             ColorSpace().convertToInverted(&imageTrasformada, &imageChannelR, &imageChannelG, &imageChannelB);
             transform = INVERTIDOS;
+        }else if(ui->comboFinal->currentIndex() == 6){ // RGB to RGB
+            ColorSpace().convertToRGB(&imageTrasformada, &imageChannelR, &imageChannelG, &imageChannelB);
         }
         
 
@@ -216,7 +215,6 @@ void Conversor::on_buttonSelectChannel_clicked()
 
         //        int max = *std::min_element(imageChannelRHisto.begin(), imageChannelRHisto.end());
 
-        renderHistogram(ui->plotHistogram, imageChannelRHisto, 10);
         imageChoosed = imageChannelR;
         channel = RED;
 
@@ -231,7 +229,6 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
         //        int max = *std::min_element(imageChannelBHisto.begin(), imageChannelBHisto.end());
-        renderHistogram(ui->plotHistogram, imageChannelBHisto, 10);
         imageChoosed = imageChannelG;
         channel = GREEN;
 
@@ -246,7 +243,6 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
         //        int max = *std::min_element(imageChannelGHisto.begin(), imageChannelGHisto.end());
-        renderHistogram(ui->plotHistogram, imageChannelGHisto, 10);
         imageChoosed = imageChannelB;
         channel = BLUE;
 
@@ -261,8 +257,7 @@ void Conversor::on_buttonSelectChannel_clicked()
         ui->labelImageEdgOrigi->setStyleSheet("border: 0px solid");
 
         //        int max = *std::min_element(imageTransformadaHisto.begin(), imageTransformadaHisto.end());
-        renderHistogram(ui->plotHistogram, imageTransformadaHisto, 10);
-        imageChoosed = imageTrasformada;
+//        renderHistogram(ui->plotHistogram, imageTransformadaHisto, 10);
         channel = GREY;
     }
 }
@@ -326,7 +321,7 @@ void Conversor::on_buttonApplyContrast_clicked(){
 void Conversor::on_buttonEdges_clicked()
 {
     imageEdges = imageChoosed;
-    int threshold = ui->spinThreshold->value();
+    int threshold = ui->spinThresholdEdges->value();
 
     if(ui->comboEdges->currentIndex() == 0){ // sobel
         Edges().sobelOperator(&imageEdges, threshold, channel);
@@ -338,74 +333,6 @@ void Conversor::on_buttonEdges_clicked()
 }
 
 
-void Conversor::renderHistogram(QCustomPlot *customPlot, QVector<double> pixelData, int maxPixel)
-{
-    QString demoName = "Bar Chart Demo";
-    // set dark background gradient:
-    QLinearGradient gradient(0, 0, 0, 400);
-    gradient.setColorAt(0, QColor(90, 90, 90));
-    gradient.setColorAt(0.38, QColor(105, 105, 105));
-    gradient.setColorAt(1, QColor(70, 70, 70));
-    customPlot->setBackground(QBrush(gradient));
-
-    // create empty bar chart objects:
-    QCPBars *numPixels = new QCPBars(customPlot->xAxis, customPlot->yAxis);
-    numPixels->setAntialiased(false); // gives more crisp, pixel aligned bar borders
-    numPixels->setStackingGap(10);
-
-    numPixels->setName("pixels");
-    numPixels->setPen(QPen(QColor(0, 168, 140).lighter(130)));
-    numPixels->setBrush(QColor(0, 168, 140));
-
-
-    // prepare x axis with country labels:
-    QVector<double> ticks;
-    QVector<QString> labels;
-    //    ticks << 1 << 2 << 3 << 4 << 5 << 6 << 7;
-    for(int i = 0; i < 256; i++){
-        ticks.append(i);
-        labels.append(QString::number(i));
-    }
-
-    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
-    textTicker->addTicks(ticks, labels);
-    customPlot->xAxis->setTicker(textTicker);
-    customPlot->xAxis->setTickLabelRotation(90);
-    customPlot->xAxis->setSubTicks(false);
-    //  customPlot->xAxis->setTickLength(0, 4);
-    customPlot->xAxis->setRange(0, 255);
-    customPlot->xAxis->setBasePen(QPen(Qt::white));
-    customPlot->xAxis->setTickPen(QPen(Qt::white));
-    customPlot->xAxis->grid()->setVisible(false);
-    //  customPlot->xAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
-    customPlot->xAxis->setTickLabelColor(Qt::white);
-    customPlot->xAxis->setLabelColor(Qt::white);
-
-    // prepare y axis:
-    customPlot->yAxis->setRange(0, maxPixel);
-    customPlot->yAxis->setPadding(1.5); // a bit more space to the left border
-    customPlot->yAxis->setBasePen(QPen(Qt::white));
-    customPlot->yAxis->setTickPen(QPen(Qt::white));
-    customPlot->yAxis->setSubTickPen(QPen(Qt::white));
-    customPlot->yAxis->grid()->setSubGridVisible(true);
-    customPlot->yAxis->setTickLabelColor(Qt::white);
-    customPlot->yAxis->setLabelColor(Qt::white);
-    customPlot->yAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::SolidLine));
-    customPlot->yAxis->grid()->setSubGridPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
-
-    // Add data:
-    numPixels->setData(ticks, pixelData);
-
-    // setup legend:
-    customPlot->legend->setVisible(false);
-    customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
-    //    customPlot->legend->setBrush(QColor(255, 255, 255, 100));
-    //    customPlot->legend->setBorderPen(Qt::NoPen);
-    QFont legendFont = font();
-    legendFont.setPointSize(10);
-    customPlot->legend->setFont(legendFont);
-    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-}
 
 
 
@@ -418,7 +345,16 @@ void Conversor::on_bUseConv_clicked()
 
 void Conversor::on_bSaveconv_clicked()
 {
+    QVector<double> histogram(QVector<double>(256));
 
+    for(int i = 0; i < imageChoosed.width(); i++){
+        for(int j = 0; j < imageChoosed.height(); j++){
+            histogram[QColor(imageChoosed.pixel(i, j)).red()]++;
+        }
+    }
+
+    HistogramView *h = new HistogramView(histogram, 10);
+    h->show();
 }
 
 void Conversor::on_bUseContrast_clicked()
@@ -429,7 +365,16 @@ void Conversor::on_bUseContrast_clicked()
 
 void Conversor::on_bSaveContrast_clicked()
 {
+    QVector<double> histogram(QVector<double>(256));
 
+    for(int i = 0; i < imageChoosed.width(); i++){
+        for(int j = 0; j < imageChoosed.height(); j++){
+            histogram[QColor(imageChoosed.pixel(i, j)).red()]++;
+        }
+    }
+
+    HistogramView *h = new HistogramView(histogram, 10);
+    h->show();
 }
 
 void Conversor::on_bUseEdges_clicked()
@@ -440,7 +385,16 @@ void Conversor::on_bUseEdges_clicked()
 
 void Conversor::on_bSaveEdges_clicked()
 {
+    QVector<double> histogram(QVector<double>(256));
 
+    for(int i = 0; i < imageChoosed.width(); i++){
+        for(int j = 0; j < imageChoosed.height(); j++){
+            histogram[QColor(imageChoosed.pixel(i, j)).red()]++;
+        }
+    }
+
+    HistogramView *h = new HistogramView(histogram, 10);
+    h->show();
 }
 
 void Conversor::on_bApplyThres_clicked()
@@ -448,6 +402,8 @@ void Conversor::on_bApplyThres_clicked()
     imageThres = imageChoosed;
     if(ui->comboThres->currentIndex() == 0){// Otsu Thresholding
         Threshold().otsuThreshold(&imageThres, channel);
+    }else if(ui->comboThres->currentIndex() == 1){
+        Threshold().manualThreshold(&imageThres, ui->spinThreshold1->value(), ui->spinThreshold2->value());
     }
 
     int wx = ui->labelImageThresTrans->width();
@@ -465,7 +421,16 @@ void Conversor::on_bUseThres_clicked()
 
 void Conversor::on_bSaveThres_clicked()
 {
+    QVector<double> histogram(QVector<double>(256));
 
+    for(int i = 0; i < imageChoosed.width(); i++){
+        for(int j = 0; j < imageChoosed.height(); j++){
+            histogram[QColor(imageChoosed.pixel(i, j)).red()]++;
+        }
+    }
+
+    HistogramView *h = new HistogramView(histogram, 10);
+    h->show();
 }
 
 void Conversor::on_bApplyMorph_clicked()

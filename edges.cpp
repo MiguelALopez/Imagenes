@@ -31,7 +31,7 @@ void Edges::sobelOperator(QImage *image, int threshold, Conversor::ChannelFilter
 
                 int matrizPixel = abs(matriz1Pixel) + abs(matriz2Pixel);
 
-                if(matrizPixel > threshold){
+                if(matrizPixel < threshold){
                     matrizPixel = 0;
                 }else{
                     matrizPixel = 255;

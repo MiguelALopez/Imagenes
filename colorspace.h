@@ -15,6 +15,7 @@ public:
     void convertToOpponet(QImage *image, QImage *channelR, QImage *channelG, QImage *channelB);
     void convertToCMY(QImage *image, QImage *channelR, QImage *channelG, QImage *channelB);
     void convertToInverted(QImage *image, QImage *channelR, QImage *channelG, QImage *channelB);
+    void convertToRGB(QImage *image, QImage *channelR, QImage *channelG, QImage *channelB);
 };
 
 #endif // COLORSPACE_H

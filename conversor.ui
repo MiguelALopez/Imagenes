@@ -190,6 +190,11 @@
                <string>Invert</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>RGB</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item row="0" column="0">
@@ -221,11 +226,14 @@
            </item>
            <item row="0" column="1">
             <widget class="QCheckBox" name="checkResize">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="text">
               <string>Auto resize</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -601,7 +609,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Save</string>
+              <string>Histogram</string>
              </property>
             </widget>
            </item>
@@ -722,7 +730,7 @@
           </layout>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <widget class="QWidget" name="widget_8" native="true">
           <layout class="QGridLayout" name="gridLayout_11">
            <item row="1" column="0" colspan="2">
@@ -786,7 +794,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Save</string>
+              <string>Histogram</string>
              </property>
             </widget>
            </item>
@@ -828,7 +836,7 @@
           </layout>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="3" column="0">
          <spacer name="verticalSpacer_4">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -848,16 +856,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCustomPlot" name="plotHistogram" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>200</height>
-           </size>
           </property>
          </widget>
         </item>
@@ -914,7 +912,7 @@
             </widget>
            </item>
            <item row="1" column="3">
-            <widget class="QSpinBox" name="spinThreshold">
+            <widget class="QSpinBox" name="spinThresholdEdges">
              <property name="maximum">
               <number>255</number>
              </property>
@@ -1000,7 +998,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Save</string>
+              <string>Histogram</string>
              </property>
             </widget>
            </item>
@@ -1138,7 +1136,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Save</string>
+              <string>Histogram</string>
              </property>
             </widget>
            </item>
@@ -1204,9 +1202,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
-            <widget class="QDoubleSpinBox" name="spinThreshold_2"/>
-           </item>
            <item row="0" column="1">
             <widget class="QComboBox" name="comboThres">
              <property name="sizePolicy">
@@ -1220,9 +1215,14 @@
                <string>Otsu Thresholding</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Manual Thresholding</string>
+              </property>
+             </item>
             </widget>
            </item>
-           <item row="0" column="4">
+           <item row="0" column="6">
             <widget class="QPushButton" name="bApplyThres">
              <property name="text">
               <string>Apply</string>
@@ -1232,10 +1232,37 @@
            <item row="0" column="2">
             <widget class="QLabel" name="label_29">
              <property name="text">
-              <string>Threshold</string>
+              <string>Threshold1</string>
              </property>
              <property name="margin">
               <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QSpinBox" name="spinThreshold1">
+             <property name="maximum">
+              <number>255</number>
+             </property>
+             <property name="value">
+              <number>50</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QLabel" name="label_34">
+             <property name="text">
+              <string>Threshold 2</string>
+             </property>
+             <property name="margin">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <widget class="QSpinBox" name="spinThreshold2">
+             <property name="maximum">
+              <number>255</number>
              </property>
             </widget>
            </item>
@@ -1291,14 +1318,6 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
