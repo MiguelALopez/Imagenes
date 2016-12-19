@@ -523,6 +523,11 @@
           </item>
           <item>
            <property name="text">
+            <string>Gaussian filter x7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Nagao filter</string>
            </property>
           </item>

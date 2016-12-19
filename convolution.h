@@ -14,6 +14,7 @@ public:
     void middleFilter(QImage *imageOriginal, int window);
     void gaussianFilterx3(QImage *imageOriginal);
     void gaussianFilterx5(QImage *imageOriginal);
+    void gaussianFilterx7(QImage *imageOriginal);
     void nagaoFilter(QImage *imageOriginal);
 private:
 

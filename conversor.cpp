@@ -283,7 +283,10 @@ void Conversor::on_buttonApplyConvolution_clicked(){
     }else if(ui->comboConvolution->currentIndex() == 5){ // Gaussian filter x5
         Convolution().gaussianFilterx5(&imageConvolution);
 
-    }else if(ui->comboConvolution->currentIndex() == 6){ // Nagao filter
+    }else if(ui->comboConvolution->currentIndex() == 6){ // Gaussian filter x7
+        Convolution().gaussianFilterx7(&imageConvolution);
+
+    }else if(ui->comboConvolution->currentIndex() == 7){ // Nagao filter
         Convolution().nagaoFilter(&imageConvolution);
 
     }

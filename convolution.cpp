@@ -170,6 +170,40 @@ void Convolution::gaussianFilterx5(QImage *imageOriginal){
     *imageOriginal = resultImage;
 }
 
+void Convolution::gaussianFilterx7(QImage *imageOriginal){
+    QImage resultImage = *imageOriginal;
+    double commonFilter[7][7] = {{0.000036, 0.000363, 0.001446, 0.002291, 0.001446, 0.000363, 0.000036},
+                              {0.000363, 0.003676, 0.014662, 0.023226, 0.014662, 0.003676, 0.000363},
+                              {0.001446, 0.014662, 0.058488, 0.092651, 0.058488, 0.014662, 0.001446},
+                              {0.002291, 0.023226, 0.092651, 0.146768, 0.092651, 0.023226, 0.002291},
+                              {0.001446, 0.014662, 0.058488, 0.092651, 0.058488, 0.014662, 0.001446},
+                              {0.000363, 0.003676, 0.014662, 0.023226, 0.014662, 0.003676, 0.000363},
+                              {0.000036, 0.000363, 0.001446, 0.002291, 0.001446, 0.000363, 0.000036}};
+    int w = imageOriginal->width();
+    int h = imageOriginal->height();
+    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+
+    for(int i = middle; i < w - middle; i++){
+        for(int j = middle; j < h - middle; j++){
+            double pixel = 0;
+
+            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
+            for(int x = 0; x < kernelSize; x++){
+                for(int y = 0; y < kernelSize; y++){
+                    pixel += (double)QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red() * commonFilter[x][y];
+                }
+            }
+//            pixel = pixel / 273;
+
+            resultImage.setPixel(i, j, qRgb(pixel, pixel, pixel));
+        }
+    }
+
+
+    // Save the result
+    *imageOriginal = resultImage;
+}
+
 void Convolution::nagaoFilter(QImage *imageOriginal){
     QImage resultImage = *imageOriginal;
     int nagaoW[5][5] = {{1,0,0,0,0},
