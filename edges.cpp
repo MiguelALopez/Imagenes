@@ -7,7 +7,7 @@ Edges::Edges()
 }
 
 
-void Edges::sobelOperator(QImage *image, int threshold, Conversor::ChannelFilter channel){
+void Edges::sobelOperator(QImage *image, int threshold){
     QImage resultImage = *image;
 
     int kernel1[3][3] = {{1, 2, 1},{0, 0, 0},{-1, -2, -1}};
@@ -44,7 +44,7 @@ void Edges::sobelOperator(QImage *image, int threshold, Conversor::ChannelFilter
             }
         }
 
-        Threshold().otsuThreshold(&resultImage, channel);
+        Threshold().otsuThreshold(&resultImage);
 //        Threshold().manualThreshold(&resultImage, 0,0);
 
 

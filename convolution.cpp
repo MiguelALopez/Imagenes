@@ -5,24 +5,23 @@ Convolution::Convolution()
 
 }
 
-void Convolution::averageFilter(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::averageFilter(QImage *imageOriginal, int window){
     QImage resultImage = *imageOriginal;
     int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
     int w = imageOriginal->width();
     int h = imageOriginal->height();
-    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    int middle = (window / 2);
 
     for(int i = middle; i < w - middle; i++){
         for(int j = middle; j < h - middle; j++){
             int pixel = 0;
 
-            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-            for(int x = 0; x < kernelSize; x++){
-                for(int y = 0; y < kernelSize; y++){
+           for(int x = 0; x < window; x++){
+                for(int y = 0; y < window; y++){
                     pixel += QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red();
                 }
             }
-            pixel = pixel / (kernelSize * kernelSize); // Se saca el promedio de todos los pixeles
+            pixel = pixel / (window * window); // Se saca el promedio de todos los pixeles
             resultImage.setPixel(i, j, qRgb(pixel, pixel, pixel));
         }
 
@@ -32,20 +31,19 @@ void Convolution::averageFilter(QImage *imageOriginal, Conversor::ChannelFilter 
     *imageOriginal = resultImage;
 }
 
-void Convolution::minimumFilter(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::minimumFilter(QImage *imageOriginal, int window){
     QImage resultImage = *imageOriginal;
-    int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+
     int w = imageOriginal->width();
     int h = imageOriginal->height();
-    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    int middle = (window / 2);
 
     for(int i = middle; i < w - middle; i++){
         for(int j = middle; j < h - middle; j++){
             int min = 255;
 
-            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-            for(int x = 0; x < kernelSize; x++){
-                for(int y = 0; y < kernelSize; y++){
+            for(int x = 0; x < window; x++){
+                for(int y = 0; y < window; y++){
                     if(QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red() < min){
                         min = QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red();
                     }
@@ -53,27 +51,24 @@ void Convolution::minimumFilter(QImage *imageOriginal, Conversor::ChannelFilter 
             }
             resultImage.setPixel(i, j, qRgb(min, min, min));
         }
-
     }
 
     // Save the result
     *imageOriginal = resultImage;
 }
 
-void Convolution::maximumFilter(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::maximumFilter(QImage *imageOriginal, int window){
     QImage resultImage = *imageOriginal;
-    int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
     int w = imageOriginal->width();
     int h = imageOriginal->height();
-    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    int middle = (window / 2);
 
     for(int i = middle; i < w - middle; i++){
         for(int j = middle; j < h - middle; j++){
             int max = 0;
 
-            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
-            for(int x = 0; x < kernelSize; x++){
-                for(int y = 0; y < kernelSize; y++){
+            for(int x = 0; x < window; x++){
+                for(int y = 0; y < window; y++){
                     if(QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red() > max){
                         max = QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red();
                     }
@@ -81,30 +76,28 @@ void Convolution::maximumFilter(QImage *imageOriginal, Conversor::ChannelFilter 
             }
             resultImage.setPixel(i, j, qRgb(max, max, max));
         }
-
     }
 
     // Save the result
     *imageOriginal = resultImage;
 }
 
-void Convolution::middleFilter(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::middleFilter(QImage *imageOriginal, int window){
     QImage resultImage = *imageOriginal;
-    int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+
     int w = imageOriginal->width();
     int h = imageOriginal->height();
-    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    int middle = (window / 2);
 
 
     for(int i = middle; i < w - middle; i++){
         for(int j = middle; j < h - middle; j++){
             int pixel = 0;
 
-            int kernelSize = sizeof(commonFilter) / sizeof(*commonFilter);
             QList<int> list;
 
-            for(int x = 0; x < kernelSize; x++){
-                for(int y = 0; y < kernelSize; y++){
+            for(int x = 0; x < window; x++){
+                for(int y = 0; y < window; y++){
                     list << QColor(imageOriginal->pixel(i - middle + x, j - middle + y)).red();
                 }
             }
@@ -121,7 +114,7 @@ void Convolution::middleFilter(QImage *imageOriginal, Conversor::ChannelFilter c
     *imageOriginal = resultImage;
 }
 
-void Convolution::gaussianFilterx3(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::gaussianFilterx3(QImage *imageOriginal){
     QImage resultImage = *imageOriginal;
     int commonFilter[3][3] = {{1,2,1},{2,4,2},{1,2,1}};
     int w = imageOriginal->width();
@@ -149,7 +142,7 @@ void Convolution::gaussianFilterx3(QImage *imageOriginal, Conversor::ChannelFilt
     *imageOriginal = resultImage;
 }
 
-void Convolution::gaussianFilterx5(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::gaussianFilterx5(QImage *imageOriginal){
     QImage resultImage = *imageOriginal;
     int commonFilter[5][5] = {{1, 4, 7, 4, 1},{4, 16, 26, 16, 4},{7, 26, 41, 26, 7}, {4, 16, 26, 16, 4}, {1, 4, 7, 4, 1}};
     int w = imageOriginal->width();
@@ -177,7 +170,7 @@ void Convolution::gaussianFilterx5(QImage *imageOriginal, Conversor::ChannelFilt
     *imageOriginal = resultImage;
 }
 
-void Convolution::nagaoFilter(QImage *imageOriginal, Conversor::ChannelFilter channel){
+void Convolution::nagaoFilter(QImage *imageOriginal){
     QImage resultImage = *imageOriginal;
     int nagaoW[5][5] = {{1,0,0,0,0},
                         {1,1,0,0,0},

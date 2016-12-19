@@ -2,20 +2,19 @@
 #define CONVOLUTION_H
 
 #include<QImage>
-#include "conversor.h"
 
 class Convolution
 {
 public:
     Convolution();
 
-    void averageFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
-    void minimumFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
-    void maximumFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
-    void middleFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
-    void gaussianFilterx3(QImage *imageOriginal, Conversor::ChannelFilter channel);
-    void gaussianFilterx5(QImage *imageOriginal, Conversor::ChannelFilter channel);
-    void nagaoFilter(QImage *imageOriginal, Conversor::ChannelFilter channel);
+    void averageFilter(QImage *imageOriginal, int window);
+    void minimumFilter(QImage *imageOriginal, int window);
+    void maximumFilter(QImage *imageOriginal, int window);
+    void middleFilter(QImage *imageOriginal, int window);
+    void gaussianFilterx3(QImage *imageOriginal);
+    void gaussianFilterx5(QImage *imageOriginal);
+    void nagaoFilter(QImage *imageOriginal);
 private:
 
 };

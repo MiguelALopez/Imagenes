@@ -5,7 +5,7 @@ Threshold::Threshold()
 
 }
 
-void Threshold::otsuThreshold(QImage *image, Conversor::ChannelFilter channel){
+void Threshold::otsuThreshold(QImage *image){
     int histogram[256];
     int w = image->width();
     int h = image->height();
@@ -81,26 +81,33 @@ void Threshold::otsuThreshold(QImage *image, Conversor::ChannelFilter channel){
     }
 }
 
-void Threshold::manualThreshold(QImage *image, int threshold1, int threshold2){
-    std::cout << threshold1 << " " << threshold2 << std::endl;
-    int threshold = triangleThreshold(image, threshold1);
-    std::cout << threshold << std::endl;
+void Threshold::manualThreshold(QImage *image, int threshold){
     for(int i = 0; i < image->width(); i++){
         for(int j = 0; j < image->height(); j++){
             int pixel = 0;
             if(QColor(image->pixel(i, j)).red() > threshold){
-
-                //            if(QColor(image->pixel(i, j)).red() >= threshold1 &&
-                //                    QColor(image->pixel(i, j)).red() <= threshold2){
                 pixel = 255;
             }
             image->setPixel(i, j, qRgb(pixel, pixel, pixel));
         }
     }
-
 }
 
-int Threshold::triangleThreshold(QImage *image, int tiki){
+void Threshold::triangleThreshold(QImage *image){
+    int threshold = triangleThresholdAux(image);
+    std::cout << threshold << std::endl;
+    for(int i = 0; i < image->width(); i++){
+        for(int j = 0; j < image->height(); j++){
+            int pixel = 0;
+            if(QColor(image->pixel(i, j)).red() > threshold){
+                pixel = 255;
+            }
+            image->setPixel(i, j, qRgb(pixel, pixel, pixel));
+        }
+    }
+}
+
+int Threshold::triangleThresholdAux(QImage *image){
     int histogram[256];
     int w = image->width();
     int h = image->height();
@@ -113,9 +120,9 @@ int Threshold::triangleThreshold(QImage *image, int tiki){
     // Se llena el histograma con los valores correspondientes
     for(int i = 0; i < w ; i++){
         for(int j = 0; j < h; j++){
-//            if (QColor(image->pixel(i, j)).red()  > tiki){
-                histogram[QColor(image->pixel(i, j)).red()]++;
-//            }
+            //            if (QColor(image->pixel(i, j)).red()  > tiki){
+            histogram[QColor(image->pixel(i, j)).red()]++;
+            //            }
         }
     }
 
@@ -208,6 +215,41 @@ int Threshold::triangleThreshold(QImage *image, int tiki){
         return split;
 }
 
-void Threshold::localThreshold(QImage *image){
+void Threshold::meanLocalThreshold(QImage *image, int window){
+    QImage resultImage = *image;
+//    int commonFilter[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
+    int w = image->width();
+    int h = image->height();
+//    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    int middle = (window / 2);
+
+    for(int i = middle; i < w - middle; i++){
+        for(int j = middle; j < h - middle; j++){
+            int max = 0;
+            int min = 255;
+
+            for(int x = 0; x < window; x++){
+                for(int y = 0; y < window; y++){
+                    if(QColor(image->pixel(i - middle + x, j - middle + y)).red() > max){
+                        max = QColor(image->pixel(i - middle + x, j - middle + y)).red();
+                    }
+
+                    if(QColor(image->pixel(i - middle + x, j - middle + y)).red() < min){
+                        min = QColor(image->pixel(i - middle + x, j - middle + y)).red();
+                    }
+                }
+            }
+            int pixel = 0;
+            int threshold = (max + min) / 2;
+            if(QColor(image->pixel(i, j)).red() < threshold){
+                pixel = 255;
+            }
+            resultImage.setPixel(i, j, qRgb(pixel, pixel, pixel));
+        }
+
+    }
+
+    // Save the result
+    *image = resultImage;
 
 }

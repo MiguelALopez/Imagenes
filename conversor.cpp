@@ -264,26 +264,27 @@ void Conversor::on_buttonSelectChannel_clicked()
 // Evento encargado de hacer la convolucion
 void Conversor::on_buttonApplyConvolution_clicked(){
     imageConvolution = imageChoosed;
+    int window = ui->spinConvolution->value();
     if(ui->comboConvolution->currentIndex() == 0){ // Average filter
-        Convolution().averageFilter(&imageConvolution, channel);
+        Convolution().averageFilter(&imageConvolution, window);
 
     }else if(ui->comboConvolution->currentIndex() == 1){ // Minimum filter
-        Convolution().minimumFilter(&imageConvolution, channel);
+        Convolution().minimumFilter(&imageConvolution, window);
 
     }else if(ui->comboConvolution->currentIndex() == 2){ // Maximum filter
-        Convolution().maximumFilter(&imageConvolution, channel);
+        Convolution().maximumFilter(&imageConvolution, window );
 
     }else if(ui->comboConvolution->currentIndex() == 3){ // Middle filter
-        Convolution().middleFilter(&imageConvolution, channel);
+        Convolution().middleFilter(&imageConvolution, window);
 
     }else if(ui->comboConvolution->currentIndex() == 4){ // Gaussian filter x3
-        Convolution().gaussianFilterx3(&imageConvolution, channel);
+        Convolution().gaussianFilterx3(&imageConvolution);
 
     }else if(ui->comboConvolution->currentIndex() == 5){ // Gaussian filter x5
-        Convolution().gaussianFilterx5(&imageConvolution, channel);
+        Convolution().gaussianFilterx5(&imageConvolution);
 
     }else if(ui->comboConvolution->currentIndex() == 6){ // Nagao filter
-        Convolution().nagaoFilter(&imageConvolution, channel);
+        Convolution().nagaoFilter(&imageConvolution);
 
     }
 
@@ -324,7 +325,7 @@ void Conversor::on_buttonEdges_clicked()
     int threshold = ui->spinThresholdEdges->value();
 
     if(ui->comboEdges->currentIndex() == 0){ // sobel
-        Edges().sobelOperator(&imageEdges, threshold, channel);
+        Edges().sobelOperator(&imageEdges, threshold);
     }
     int wx = ui->labelImageEdgTrasf->width();
     int hx = ui->labelImageEdgTrasf->height();
@@ -397,13 +398,15 @@ void Conversor::on_bSaveEdges_clicked()
     h->show();
 }
 
-void Conversor::on_bApplyThres_clicked()
+void Conversor::on_bApplyGlobalThres_clicked()
 {
     imageThres = imageChoosed;
-    if(ui->comboThres->currentIndex() == 0){// Otsu Thresholding
-        Threshold().otsuThreshold(&imageThres, channel);
-    }else if(ui->comboThres->currentIndex() == 1){
-        Threshold().manualThreshold(&imageThres, ui->spinThreshold1->value(), ui->spinThreshold2->value());
+    if(ui->comboGlobalThres->currentIndex() == 0){// Otsu Thresholding
+        Threshold().otsuThreshold(&imageThres);
+    }else if(ui->comboGlobalThres->currentIndex() == 1){ // Manual Thresholding
+        Threshold().manualThreshold(&imageThres, ui->spinThreshold->value());
+    }else if(ui->comboGlobalThres->currentIndex() == 2){ // Triangle Thresholding
+        Threshold().triangleThreshold(&imageThres);
     }
 
     int wx = ui->labelImageThresTrans->width();
@@ -452,4 +455,21 @@ void Conversor::on_buttonSave_clicked()
 {
     QString file = QFileDialog::getSaveFileName(this, tr("Save File"), "", "Image (*.png)");
     imageChoosed.save(file, "png");
+}
+
+void Conversor::on_bApplyLocalThres_clicked()
+{
+    imageThres = imageChoosed;
+    int window = ui->spinLocalThres->value();
+    if(ui->comboLocalThres->currentIndex() == 0){// Mean Thresholding
+        Threshold().meanLocalThreshold(&imageThres, window);
+//        Threshold().otsuThreshold(&imageThres, channel);
+    }else if(ui->comboLocalThres->currentIndex() == 1){
+//        Threshold().manualThreshold(&imageThres, ui->spinThreshold1->value(), ui->spinThreshold2->value());
+    }
+
+    int wx = ui->labelImageThresTrans->width();
+    int hx = ui->labelImageThresTrans->height();
+    ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(wx, hx, Qt::KeepAspectRatio));
+    ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
 }

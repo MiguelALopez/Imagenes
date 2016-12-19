@@ -27,7 +27,6 @@ void MorphologicalOperators::dilate(QImage *image){
             }
             resultImage.setPixel(i, j, qRgb(pixel, pixel, pixel));
         }
-
     }
 
     // Save the result

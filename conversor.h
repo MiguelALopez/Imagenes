@@ -64,7 +64,7 @@ private slots:
 
     void on_bSaveEdges_clicked();
 
-    void on_bApplyThres_clicked();
+    void on_bApplyGlobalThres_clicked();
 
     void on_bUseThres_clicked();
 
@@ -73,6 +73,8 @@ private slots:
     void on_bApplyMorph_clicked();
 
     void on_buttonSave_clicked();
+
+    void on_bApplyLocalThres_clicked();
 
 private:
     Ui::Conversor *ui;
