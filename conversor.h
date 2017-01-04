@@ -9,8 +9,6 @@
 #include <iostream>
 #include <math.h>
 #include <algorithm>
-//#include <QtCharts>
-//#include <QtCharts/QBarSeries>
 #include "histogramview.h"
 
 namespace Ui {
@@ -75,6 +73,14 @@ private slots:
     void on_buttonSave_clicked();
 
     void on_bApplyLocalThres_clicked();
+
+    void on_bDeleteMask_clicked();
+
+    void on_bErrorConv_clicked();
+
+    void on_bError_clicked();
+
+    void on_bAuto_clicked();
 
 private:
     Ui::Conversor *ui;

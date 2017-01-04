@@ -6,6 +6,7 @@
 #include "edges.h"
 #include "threshold.h"
 #include "morphologicaloperators.h"
+#include "error.h"
 
 Conversor::Conversor(QWidget *parent) :
     QMainWindow(parent),
@@ -105,7 +106,7 @@ void Conversor::on_tabWidget_currentChanged(int index){
 // Evento encargado de cargar la imagen desde una ubicacion
 void Conversor::on_buttonLoad_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", "All Files (*.*);;Image (*.png)");
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/miguel/Imágenes/Retina/DRIVE/test/images/", "All Files (*.*);;Image (*.png)");
 
     if(filename != NULL){
 
@@ -456,7 +457,7 @@ void Conversor::on_bApplyMorph_clicked()
 
 void Conversor::on_buttonSave_clicked()
 {
-    QString file = QFileDialog::getSaveFileName(this, tr("Save File"), "", "Image (*.png)");
+    QString file = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/miguel/Imágenes/Retina/resultados/", "Image (*.png)");
     imageChoosed.save(file, "png");
 }
 
@@ -475,4 +476,86 @@ void Conversor::on_bApplyLocalThres_clicked()
     int hx = ui->labelImageThresTrans->height();
     ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(wx, hx, Qt::KeepAspectRatio));
     ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
+}
+
+void Conversor::on_bDeleteMask_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/miguel/Imágenes/Retina/DRIVE/test/mask", "All Files (*.*);;Image (*.png)");
+
+    if(filename != NULL){
+        QImage image;
+        image.load(filename);
+
+
+
+        imageThres = imageChoosed;
+        int x = imageThres.width();
+        int y = imageThres.height();
+
+        for(int i = 0; i < x; i++){
+            for(int j = 0; j < y; j++){
+                if(QColor(image.pixel(i,j)).red() == 0){
+                    imageThres.setPixel(i, j, qRgb(0, 0, 0));
+                }
+            }
+        }
+
+        int wx = ui->labelImageThresTrans->width();
+        int hx = ui->labelImageThresTrans->height();
+        ui->labelImageThresTrans->setPixmap(QPixmap::fromImage(imageThres).scaled(wx, hx, Qt::KeepAspectRatio));
+        ui->labelImageThresTrans->setStyleSheet("border: 0px solid");
+    }
+
+}
+
+void Conversor::on_bErrorConv_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/miguel/Imágenes/Retina/DRIVE/test/1st_manual", "All Files (*.*);;Image (*.png)");
+
+    if(filename != NULL){
+        QImage image;
+        image.load(filename);
+        Error().ConfusionMatix(&image, &imageConvolution);
+    }
+}
+
+void Conversor::on_bError_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/miguel/Imágenes/Retina/DRIVE/test/1st_manual/", "All Files (*.*);;Image (*.png)");
+
+    if(filename != NULL){
+        QImage image;
+        image.load(filename);
+        Error().ConfusionMatix(&image, &imageChoosed);
+    }
+}
+
+void Conversor::on_bAuto_clicked()
+{
+//    ColorSpace().convertToRGB(&imageTrasformada, &imageChannelR, &imageChannelG, &imageChannelB);
+//    imageChoosed = imageChannelG;
+    Convolution().gaussianFilterx5(&imageChoosed);
+    Threshold().meanLocalThreshold(&imageChoosed, 3);
+
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/miguel/Imágenes/Retina/DRIVE/test/mask", "All Files (*.*);;Image (*.png)");
+
+    if(filename != NULL){
+        QImage image;
+        image.load(filename);
+
+        int x = imageChoosed.width();
+        int y = imageChoosed.height();
+
+        for(int i = 0; i < x; i++){
+            for(int j = 0; j < y; j++){
+                if(QColor(image.pixel(i,j)).red() == 0){
+                    imageChoosed.setPixel(i, j, qRgb(0, 0, 0));
+                }
+            }
+        }
+
+    }
+
+    Convolution().middleFilter(&imageChoosed, 3);
+    resizeWindow();
 }

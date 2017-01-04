@@ -25,7 +25,7 @@ void Threshold::otsuThreshold(QImage *image){
         }
     }
 
-    // Total numver of pixels
+    // Total number of pixels
     int total = image->height() * image->width();
 
     double sum = 0;
