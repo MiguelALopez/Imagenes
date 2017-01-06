@@ -5,29 +5,7 @@ Threshold::Threshold()
 
 }
 
-void Threshold::otsuThreshold(QImage *image){
-    int histogram[256];
-    int w = image->width();
-    int h = image->height();
-
-    // Se inicializa el arreglo en 0
-    for(int i = 0; i < 256; i++){
-        histogram[i] = 0;
-    }
-
-    // Se llena el histograma con los valores correspondientes
-    for(int i = 0; i < w ; i++){
-        for(int j = 0; j < h; j++){
-            //            if (QColor(image->pixel(i, j)).red() != 0 && QColor(image->pixel(i, j)).red() != 1 &&
-            //                    QColor(image->pixel(i, j)).red() != 2){
-            histogram[QColor(image->pixel(i, j)).red()]++;
-            //            }
-        }
-    }
-
-    // Total number of pixels
-    int total = image->height() * image->width();
-
+int Threshold::otsu(int total, int histogram[]){
     double sum = 0;
     for(int i = 0; i < 256; i++){
         sum += i * histogram[i];
@@ -64,8 +42,35 @@ void Threshold::otsuThreshold(QImage *image){
             varMax = varBetween;
             threshold = i;
         }
-
     }
+
+    return threshold;
+}
+
+void Threshold::otsuGlobalThreshold(QImage *image){
+    int histogram[256];
+    int w = image->width();
+    int h = image->height();
+
+    // Se inicializa el arreglo en 0
+    for(int i = 0; i < 256; i++){
+        histogram[i] = 0;
+    }
+
+    // Se llena el histograma con los valores correspondientes
+    for(int i = 0; i < w ; i++){
+        for(int j = 0; j < h; j++){
+            //            if (QColor(image->pixel(i, j)).red() != 0 && QColor(image->pixel(i, j)).red() != 1 &&
+            //                    QColor(image->pixel(i, j)).red() != 2){
+            histogram[QColor(image->pixel(i, j)).red()]++;
+            //            }
+        }
+    }
+
+    // Total number of pixels
+    int total = image->height() * image->width();
+
+    int threshold = otsu(total, histogram);
 
     for(int i = 0; i < w ; i++){
         for(int j = 0; j < h; j++){
@@ -251,5 +256,43 @@ void Threshold::meanLocalThreshold(QImage *image, int window){
 
     // Save the result
     *image = resultImage;
+}
 
+void Threshold::otsuLocalThreshold(QImage *image, int window){
+    QImage resultImage = *image;
+
+    int w = image->width();
+    int h = image->height();
+//    int middle = (sizeof(commonFilter) / sizeof(*commonFilter)) / 2;
+    int middle = (window / 2);
+
+    for(int i = middle; i < w - middle; i++){
+        for(int j = middle; j < h - middle; j++){
+
+            int histogram[256];
+
+            // Se inicializa el arreglo en 0
+            for(int i = 0; i < 256; i++){
+                histogram[i] = 0;
+            }
+
+            for(int x = 0; x < window; x++){
+                for(int y = 0; y < window; y++){
+                    histogram[QColor(image->pixel(i - middle + x, j - middle + y)).red()]++;
+
+                }
+            }
+            int pixel = 0;
+            int total = window * window;
+            int threshold = otsu(total, histogram);
+            if(QColor(image->pixel(i, j)).red() < threshold){
+                pixel = 255;
+            }
+            resultImage.setPixel(i, j, qRgb(pixel, pixel, pixel));
+        }
+
+    }
+
+    // Save the result
+    *image = resultImage;
 }

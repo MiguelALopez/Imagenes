@@ -329,7 +329,8 @@ void Conversor::on_buttonEdges_clicked()
     int threshold = ui->spinThresholdEdges->value();
 
     if(ui->comboEdges->currentIndex() == 0){ // sobel
-        Edges().sobelOperator(&imageEdges, threshold);
+        bool autoThres = ui->checkAutoThreshold->isChecked();
+        Edges().sobelOperator(&imageEdges, autoThres, threshold);
     }
     int wx = ui->labelImageEdgTrasf->width();
     int hx = ui->labelImageEdgTrasf->height();
@@ -406,7 +407,7 @@ void Conversor::on_bApplyGlobalThres_clicked()
 {
     imageThres = imageChoosed;
     if(ui->comboGlobalThres->currentIndex() == 0){// Otsu Thresholding
-        Threshold().otsuThreshold(&imageThres);
+        Threshold().otsuGlobalThreshold(&imageThres);
     }else if(ui->comboGlobalThres->currentIndex() == 1){ // Manual Thresholding
         Threshold().manualThreshold(&imageThres, ui->spinThreshold->value());
     }else if(ui->comboGlobalThres->currentIndex() == 2){ // Triangle Thresholding
@@ -465,10 +466,11 @@ void Conversor::on_bApplyLocalThres_clicked()
 {
     imageThres = imageChoosed;
     int window = ui->spinLocalThres->value();
-    if(ui->comboLocalThres->currentIndex() == 0){// Mean Thresholding
+    if(ui->comboLocalThres->currentIndex() == 0){ // Mean Thresholding
         Threshold().meanLocalThreshold(&imageThres, window);
 //        Threshold().otsuThreshold(&imageThres, channel);
-    }else if(ui->comboLocalThres->currentIndex() == 1){
+    }else if(ui->comboLocalThres->currentIndex() == 1){ // Otsu Thresholding
+        Threshold().otsuLocalThreshold(&imageThres, window);
 //        Threshold().manualThreshold(&imageThres, ui->spinThreshold1->value(), ui->spinThreshold2->value());
     }
 
@@ -535,7 +537,8 @@ void Conversor::on_bAuto_clicked()
 //    ColorSpace().convertToRGB(&imageTrasformada, &imageChannelR, &imageChannelG, &imageChannelB);
 //    imageChoosed = imageChannelG;
     Convolution().gaussianFilterx5(&imageChoosed);
-    Threshold().meanLocalThreshold(&imageChoosed, 3);
+//    Threshold().meanLocalThreshold(&imageChoosed, 3);
+    Threshold().otsuLocalThreshold(&imageChoosed, 3);
 
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/miguel/Imágenes/Retina/DRIVE/test/mask", "All Files (*.*);;Image (*.png)");
 

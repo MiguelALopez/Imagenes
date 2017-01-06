@@ -949,6 +949,40 @@
         <item row="2" column="0">
          <widget class="QWidget" name="widget_7" native="true">
           <layout class="QGridLayout" name="gridLayout_13">
+           <item row="1" column="4">
+            <widget class="QSpinBox" name="spinThresholdEdges">
+             <property name="maximum">
+              <number>255</number>
+             </property>
+             <property name="value">
+              <number>56</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLabel" name="label_23">
+             <property name="text">
+              <string>Threshold</string>
+             </property>
+             <property name="margin">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="5">
+            <widget class="QPushButton" name="buttonEdges">
+             <property name="text">
+              <string>Apply</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>Method</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="1">
             <widget class="QComboBox" name="comboEdges">
              <property name="sizePolicy">
@@ -964,37 +998,10 @@
              </item>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_20">
-             <property name="text">
-              <string>Method</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QPushButton" name="buttonEdges">
-             <property name="text">
-              <string>Apply</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QSpinBox" name="spinThresholdEdges">
-             <property name="maximum">
-              <number>255</number>
-             </property>
-             <property name="value">
-              <number>56</number>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="2">
-            <widget class="QLabel" name="label_23">
+            <widget class="QCheckBox" name="checkAutoThreshold">
              <property name="text">
-              <string>Threshold</string>
-             </property>
-             <property name="margin">
-              <number>10</number>
+              <string>Auto</string>
              </property>
             </widget>
            </item>
@@ -1360,6 +1367,11 @@
              <item>
               <property name="text">
                <string>Mean Thresholding</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Otsu Thresholding</string>
               </property>
              </item>
             </widget>

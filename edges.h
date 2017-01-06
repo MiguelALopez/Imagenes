@@ -8,7 +8,7 @@ class Edges
 public:
     Edges();
 
-    void sobelOperator(QImage *image, int threshold);
+    void sobelOperator(QImage *image, bool autoThres, int threshold);
 };
 
 #endif // EDGES_H

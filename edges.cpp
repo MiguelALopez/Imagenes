@@ -7,7 +7,7 @@ Edges::Edges()
 }
 
 
-void Edges::sobelOperator(QImage *image, int threshold){
+void Edges::sobelOperator(QImage *image, bool autoThres, int threshold){
     QImage resultImage = *image;
 
     int kernel1[3][3] = {{1, 2, 1},{0, 0, 0},{-1, -2, -1}};
@@ -32,21 +32,15 @@ void Edges::sobelOperator(QImage *image, int threshold){
 
                 int matrizPixel = abs(matriz1Pixel) + abs(matriz2Pixel);
 
-
-
-//                if(matrizPixel < threshold){
-//                    matrizPixel = 0;
-//                }else{
-//                    matrizPixel = 255;
-//                }
-
                 resultImage.setPixel(i, j, qRgb(matrizPixel, matrizPixel, matrizPixel));
             }
         }
 
-        Threshold().otsuThreshold(&resultImage);
-//        Threshold().manualThreshold(&resultImage, 0,0);
-
+        if(autoThres){
+            Threshold().otsuGlobalThreshold(&resultImage);
+        }else{
+            Threshold().manualThreshold(&resultImage, threshold);
+        }
 
     *image = resultImage;
 }
